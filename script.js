@@ -148,7 +148,7 @@ async function callClaudeAPI(prompt) {
   // ── Koboi LLM Gateway ──────────────────────────────────────
   // Ganti KOBOI_API_KEY dengan Virtual Key dari:
   // https://lite.koboillm.com/ui → Virtual Keys → copy key
-  const KOBOI_API_KEY  = 'sk-ant-XXXXXXXXXXXXXXXX'; // ← GANTI INI
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // ← GANTI INI
   const KOBOI_BASE_URL = 'https://lite.koboillm.com';
 
   const response = await fetch(KOBOI_BASE_URL + '/v1/messages', {
