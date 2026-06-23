@@ -142,11 +142,11 @@ Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
 
 /* ============================================================
-   CLAUDE API CALL (Kembali ke API Koboi Awal Anda)
+   CLAUDE API CALL (API Asli Anda)
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // Key asli Anda yang sudah jalan
-  const KOBOI_BASE_URL = 'https://lite.koboillm.com';
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g';
+  const KOBOI_BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)';
 
   const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
@@ -178,8 +178,7 @@ async function callClaudeAPI(prompt) {
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|
-```/g, '').trim();
+  const clean = raw.replace(/```json|```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
