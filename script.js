@@ -292,7 +292,11 @@ function toggleClip(i) {
 function copyVO(i) {
   const clip = currentClips[i];
   if (!clip) return;
-  navigator.clipboard.writeText(clip.vo_script || '').then(() => {
+  
+  // Mengabaikan teks di dalam kurung siku [...] agar ElevenLabs tidak ikut membacanya
+  const cleanVO = (clip.vo_script || '').replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim();
+
+  navigator.clipboard.writeText(cleanVO).then(() => {
     const btn = document.getElementById('copyBtn' + i);
     if (btn) {
       btn.textContent = '✓ COPIED';
