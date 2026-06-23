@@ -84,13 +84,13 @@ async function startAnalysis() {
 }
 
 /* ============================================================
-   PROMPT BUILDER (Versi Anti-Dismon / Reaction & Commentary)
+   PROMPT BUILDER (Versi Teks Statis CapCut Top & Bottom)
    ============================================================ */
 function buildPrompt(input, lang, tone, count, duration) {
   const toneDesc = TONE_DESC[tone] || 'dramatis';
 
   return `Kamu adalah kreator YouTube Shorts super sukses yang fokus pada konten "Movie Commentary & Reaction" (Komentar Film). 
-Tujuanmu adalah membuat naskah yang 100% LOLOS MONETISASI YouTube (Transformatif, bukan sekadar Reused Content).
+Tujuanmu adalah membuat naskah yang 100% LOLOS MONETISASI YouTube (Transformatif).
 
 Film/input dari user: "${input}"
 
@@ -119,23 +119,24 @@ Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JS
       "duration_seconds": ${duration},
       "hype_level": 5,
       "reason": "alasan kenapa adegan ini layak dikomentari",
+      "teks_statis_capcut": {
+        "judul_atas": "JUDUL ATAS LAYAR (Maks 4 kata, wajib Kapital semua, mewakili klip)",
+        "opsi_hook_bawah": [
+          "Opsi 1 hook teks bawah layar (Maks 6 kata, provokatif/penasaran)",
+          "Opsi 2 hook teks bawah layar (Maks 6 kata, pertanyaan)",
+          "Opsi 3 hook teks bawah layar (Maks 6 kata, emosional)"
+        ]
+      },
       "vo_script": "skrip voice over commentary",
-      "hooks": [
-        "opsi hook 1 (maks 7 kata, memancing penasaran)",
-        "opsi hook 2 (emosional atau provokatif)",
-        "opsi hook 3 (gaya bahasa tongkrongan/pertanyaan)"
-      ],
       "hashtags": ["#tag1", "#tag2", "#tag3"]
     }
   ]
 }
 
-ATURAN WAJIB UNTUK HOOK DAN VO SCRIPT (ANTI-DISMON):
-1. GAYA BAHASA TONGKRONGAN: Gunakan bahasa tutur Indonesia yang sangat kasual dan natural (contoh: "nggak", "kayak", "cowok ini", "gila banget", "coba deh perhatiin"). JANGAN KAKU.
-2. BERIKAN OPINI/ANALISIS: Sisipkan reaksi manusiawi. Contoh format yang disukai: "Kalian sadar nggak sih kalau...", "Sumpah, gue merinding banget pas adegan ini...", atau "Ini adalah keputusan paling bodoh yang dia ambil...".
-3. TANDA BACA UNTUK ELEVENLABS: Gunakan elipsis (...) untuk jeda mikir/tegang, dan tanda seru (!) untuk nge-gas atau emosi.
-4. ARAHAN KAMERA (AKTING): Di dalam vo_script, sisipkan teks di dalam kurung siku sebagai arahan untuk kreator yang tampil di depan kamera. Contoh: "[Geleng-geleng kepala] Sumpah cowok ini nekat banget... [Tunjuk ke atas] Kalian lihat deh apa yang dia pegang!"
-5. 3 OPSI HOOK CURIOSITY GAP: Wajib berikan 3 kalimat rekomendasi untuk teks statis di CapCut. Buat penonton berhenti nge-scroll di detik pertama.
+ATURAN WAJIB UNTUK TEKS CAPCUT & VO SCRIPT:
+1. TEKS STATIS CAPCUT: User akan memasang teks ini dari detik pertama hingga akhir video. "judul_atas" harus mencolok (contoh: "FAKTA TERSEMBUNYI TITANIC"), dan "opsi_hook_bawah" harus memancing orang berkomentar (contoh: "Kenapa dia lakuin ini?!").
+2. GAYA BAHASA VO: Gunakan bahasa tutur Indonesia yang sangat kasual dan natural (contoh: "nggak", "kayak", "gila banget").
+3. ARAHAN KAMERA (AKTING): Di dalam vo_script, sisipkan teks di dalam kurung siku sebagai arahan untuk kreator. Contoh: "[Geleng-geleng kepala] Sumpah cowok ini nekat banget..."
 
 Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
@@ -144,8 +145,7 @@ Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
    CLAUDE API CALL
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  // ── Koboi LLM Gateway (Format Gemini/OpenAI) ──────────────
-  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // Pastikan key ini aktif
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g';
   const KOBOI_BASE_URL = 'https://lite.koboillm.com';
 
   const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
@@ -178,7 +178,8 @@ async function callClaudeAPI(prompt) {
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|```/g, '').trim();
+  const clean = raw.replace(/```json|
+```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
@@ -194,7 +195,6 @@ function parseResponse(raw) {
 function renderResults(data, lang, duration) {
   const { movie, clips } = data;
 
-  /* ── Movie meta ── */
   const metaEl = document.getElementById('movieMeta');
   metaEl.innerHTML = `
     <div class="movie-poster">🎬</div>
@@ -210,15 +210,12 @@ function renderResults(data, lang, duration) {
     </div>
   `;
 
-  /* ── Clip cards ── */
   const grid = document.getElementById('clipsGrid');
   grid.innerHTML = clips.map((clip, i) => {
     const flames = '🔥'.repeat(Math.min(clip.hype_level || 3, 5));
     
-    // Menyiapkan HTML untuk 3 Opsi Hook
-    const hookList = (clip.hooks && clip.hooks.length > 0) 
-      ? clip.hooks.map((h, idx) => `<div style="margin-bottom: 6px;"><strong>Opsi ${idx + 1}:</strong> "${h}"</div>`).join('')
-      : `<div>"${clip.hook || '-'}"</div>`; // Fallback jika AI merespon dengan format lama
+    // Menangkap data teks statis capcut dari AI
+    const ts = clip.teks_statis_capcut || { judul_atas: clip.title, opsi_hook_bawah: ["Hook 1", "Hook 2", "Hook 3"] };
 
     return `
     <div class="clip-card" id="clipCard${i}">
@@ -260,13 +257,27 @@ function renderResults(data, lang, duration) {
           <div class="scene-desc">${clip.scene_description || '-'}</div>
         </div>
 
-        <div class="vo-section">
-          <h4 class="section-label" style="margin:14px 0 8px">📌 Rekomendasi Hook Teks CapCut (Pilih Satu)</h4>
-          <div class="scene-desc" style="color:var(--accent2);font-size: 0.95rem;">
-            ${hookList}
+        <!-- BLOK BARU UNTUK TEKS CAPCUT (FULL DURASI) -->
+        <div class="info-block" style="margin-top:14px; background: rgba(255, 69, 0, 0.08); border-left: 3px solid var(--primary); padding: 14px;">
+          <h4 style="color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            📱 Teks Statis CapCut (Tampil Awal s/d Akhir)
+          </h4>
+          <div style="font-family: monospace; font-size: 0.95rem; line-height: 1.6;">
+            <div style="color: #fff; margin-bottom: 6px;">
+              <strong>[TEKS ATAS] Judul:</strong><br> 
+              <span style="color:var(--gold); font-size: 1.05rem;">"${ts.judul_atas}"</span>
+            </div>
+            <div style="color: #fff;"><strong>[TEKS BAWAH] Pilih 1 Hook:</strong></div>
+            <ul style="margin: 4px 0 0 20px; color: var(--accent2);">
+              <li>"${ts.opsi_hook_bawah[0] || '-'}"</li>
+              <li>"${ts.opsi_hook_bawah[1] || '-'}"</li>
+              <li>"${ts.opsi_hook_bawah[2] || '-'}"</li>
+            </ul>
           </div>
+        </div>
 
-          <h4 class="section-label" style="margin:14px 0 8px">🎙 Skrip Voice Over — ${LANG_LABELS[lang] || lang}</h4>
+        <div class="vo-section" style="margin-top: 14px;">
+          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip Voice Over — ${LANG_LABELS[lang] || lang}</h4>
           <div class="vo-script-box" id="voBox${i}">
             <button class="vo-copy-btn" id="copyBtn${i}" onclick="copyVO(${i})">COPY</button>
             <div class="vo-text">${clip.vo_script || '-'}</div>
@@ -305,7 +316,6 @@ function copyVO(i) {
   const clip = currentClips[i];
   if (!clip) return;
   
-  // Mengabaikan teks di dalam kurung siku [...] agar ElevenLabs tidak ikut membacanya
   const cleanVO = (clip.vo_script || '').replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim();
 
   navigator.clipboard.writeText(cleanVO).then(() => {
@@ -322,9 +332,8 @@ function copyFullClip(i) {
   const clip = currentClips[i];
   if (!clip) return;
 
-  const hookText = (clip.hooks && clip.hooks.length > 0) 
-    ? clip.hooks.map((h, idx) => `${idx + 1}. "${h}"`).join('\n')
-    : `"${clip.hook || '-'}"`;
+  const ts = clip.teks_statis_capcut || { judul_atas: "-", opsi_hook_bawah: [] };
+  const hookText = (ts.opsi_hook_bawah || []).map((h, idx) => `Opsi ${idx + 1}: "${h}"`).join('\n');
 
   const txt =
 `=== KLIP ${clip.id}: ${clip.title} ===
@@ -334,10 +343,12 @@ Durasi    : ${clip.duration_seconds} detik  |  Hype: ${clip.hype_level}/5
 DESKRIPSI ADEGAN:
 ${clip.scene_description}
 
-3 OPSI HOOK (Untuk Teks Layar CapCut):
+📱 TEKS STATIS CAPCUT (Tampil Awal s/d Akhir):
+Teks Atas (Judul) : "${ts.judul_atas}"
+Teks Bawah (Hook) :
 ${hookText}
 
-SKRIP VOICE OVER:
+🎙 SKRIP VOICE OVER:
 ${clip.vo_script}
 
 HASHTAG: ${(clip.hashtags || []).join(' ')}
@@ -367,8 +378,8 @@ pad=1080:1920:(ow-iw)/2:(oh-ih)/2" \\
   "klip_${clip.id}_${name}.mp4"</div>
     <p class="modal-note">
       📱 <strong>Format:</strong> Output 9:16 (1080×1920) siap untuk Shorts / Reels / TikTok.<br>
-      🎙 <strong>VO:</strong> Rekam voice over lalu gabungkan dengan CapCut / DaVinci Resolve / Premiere.<br>
-      ⚡ <strong>Tips:</strong> Tambahkan subtitle auto-generate di CapCut untuk engagement lebih tinggi.
+      🎙 <strong>VO:</strong> Rekam voice over lalu gabungkan dengan CapCut.<br>
+      ⚡ <strong>Tips:</strong> Pasang Teks Atas (Judul) dan Teks Bawah (Hook) di CapCut sepanjang durasi klip.
     </p>
     <div class="clip-actions" style="margin-top:16px">
       <button class="clip-action-btn primary" onclick="copyFFmpeg(${i})">📋 Copy Command ffmpeg</button>
@@ -408,11 +419,13 @@ function exportAll() {
     out += `Hype      : ${'★'.repeat(clip.hype_level || 3)}\n\n`;
     out += `Deskripsi:\n${clip.scene_description}\n\n`;
     
-    const hookText = (clip.hooks && clip.hooks.length > 0) 
-      ? clip.hooks.map((h, idx) => `${idx + 1}. "${h}"`).join('\n')
-      : `"${clip.hook || '-'}"`;
+    const ts = clip.teks_statis_capcut || { judul_atas: "-", opsi_hook_bawah: [] };
+    const hookText = (ts.opsi_hook_bawah || []).map((h, idx) => `Opsi ${idx + 1}: "${h}"`).join('\n');
       
-    out += `3 Opsi Hook:\n${hookText}\n\n`;
+    out += `TEKS STATIS CAPCUT (Awal s/d Akhir):\n`;
+    out += `Teks Atas: "${ts.judul_atas}"\n`;
+    out += `Teks Bawah:\n${hookText}\n\n`;
+    
     out += `VO Script:\n${clip.vo_script}\n\n`;
     out += `Hashtag: ${(clip.hashtags || []).join(' ')}\n`;
     out += `${'─'.repeat(40)}\n\n`;
@@ -453,7 +466,6 @@ async function completeStep(id) {
   el.classList.remove('active');
   el.classList.add('done');
   el.querySelector('.step-icon').textContent = '✓';
-  /* Also complete all previous steps */
   const ids = ['step1','step2','step3','step4','step5'];
   const idx  = ids.indexOf(id);
   for (let j = 0; j < idx; j++) {
