@@ -145,23 +145,19 @@ Pastikan:
    CLAUDE API CALL
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  // ── Koboi LLM Gateway ──────────────────────────────────────
-  // Ganti KOBOI_API_KEY dengan Virtual Key dari:
-  // https://lite.koboillm.com/ui → Virtual Keys → copy key
-  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // ← GANTI INI
+  // ── Koboi LLM Gateway (Format Gemini/OpenAI) ──────────────
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // Pastikan key ini aktif
   const KOBOI_BASE_URL = 'https://lite.koboillm.com';
 
-  const response = await fetch(KOBOI_BASE_URL + '/v1/messages', {
+  const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
     headers : {
-      'Content-Type'      : 'application/json',
-      'x-api-key'         : KOBOI_API_KEY,
-      'anthropic-version' : '2023-06-01',
+      'Content-Type'  : 'application/json',
+      'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
       model      : 'gemini/gemini-2.5-flash-lite',
-      max_tokens : 4000,
-      messages   : [{ role: 'user', content: prompt }],
+      messages   : [{ role: 'user', content: prompt }]
     }),
   });
 
@@ -171,7 +167,12 @@ async function callClaudeAPI(prompt) {
   }
 
   const data = await response.json();
-  return data.content.map(function(b){ return b.text || ''; }).join('');
+  
+  if (data.choices && data.choices.length > 0) {
+    return data.choices[0].message.content;
+  } else {
+    throw new Error('Respons dari AI kosong atau format tidak sesuai.');
+  }
 }
 
 /* ============================================================
