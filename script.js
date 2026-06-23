@@ -120,7 +120,11 @@ Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JS
       "hype_level": 5,
       "reason": "alasan kenapa adegan ini layak dikomentari",
       "vo_script": "skrip voice over commentary",
-      "hook": "kalimat pembuka 5 detik pertama",
+      "hooks": [
+        "opsi hook 1 (maks 7 kata, memancing penasaran)",
+        "opsi hook 2 (emosional atau provokatif)",
+        "opsi hook 3 (gaya bahasa tongkrongan/pertanyaan)"
+      ],
       "hashtags": ["#tag1", "#tag2", "#tag3"]
     }
   ]
@@ -131,7 +135,7 @@ ATURAN WAJIB UNTUK HOOK DAN VO SCRIPT (ANTI-DISMON):
 2. BERIKAN OPINI/ANALISIS: Sisipkan reaksi manusiawi. Contoh format yang disukai: "Kalian sadar nggak sih kalau...", "Sumpah, gue merinding banget pas adegan ini...", atau "Ini adalah keputusan paling bodoh yang dia ambil...".
 3. TANDA BACA UNTUK ELEVENLABS: Gunakan elipsis (...) untuk jeda mikir/tegang, dan tanda seru (!) untuk nge-gas atau emosi.
 4. ARAHAN KAMERA (AKTING): Di dalam vo_script, sisipkan teks di dalam kurung siku sebagai arahan untuk kreator yang tampil di depan kamera. Contoh: "[Geleng-geleng kepala] Sumpah cowok ini nekat banget... [Tunjuk ke atas] Kalian lihat deh apa yang dia pegang!"
-5. HOOK CURIOSITY GAP: Buat penonton berhenti nge-scroll di detik pertama tanpa menyebut nama karakter langsung.
+5. 3 OPSI HOOK CURIOSITY GAP: Wajib berikan 3 kalimat rekomendasi untuk teks statis di CapCut. Buat penonton berhenti nge-scroll di detik pertama.
 
 Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
@@ -174,7 +178,8 @@ async function callClaudeAPI(prompt) {
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|```/g, '').trim();
+  const clean = raw.replace(/```json|
+```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
@@ -210,6 +215,12 @@ function renderResults(data, lang, duration) {
   const grid = document.getElementById('clipsGrid');
   grid.innerHTML = clips.map((clip, i) => {
     const flames = '🔥'.repeat(Math.min(clip.hype_level || 3, 5));
+    
+    // Menyiapkan HTML untuk 3 Opsi Hook
+    const hookList = (clip.hooks && clip.hooks.length > 0) 
+      ? clip.hooks.map((h, idx) => `<div style="margin-bottom: 6px;"><strong>Opsi ${idx + 1}:</strong> "${h}"</div>`).join('')
+      : `<div>"${clip.hook || '-'}"</div>`; // Fallback jika AI merespon dengan format lama
+
     return `
     <div class="clip-card" id="clipCard${i}">
 
@@ -251,8 +262,10 @@ function renderResults(data, lang, duration) {
         </div>
 
         <div class="vo-section">
-          <h4 class="section-label" style="margin:14px 0 8px">🎙 Hook Pembuka (5 detik pertama)</h4>
-          <div class="scene-desc" style="color:var(--accent2);font-style:italic">"${clip.hook || '-'}"</div>
+          <h4 class="section-label" style="margin:14px 0 8px">📌 Rekomendasi Hook Teks CapCut (Pilih Satu)</h4>
+          <div class="scene-desc" style="color:var(--accent2);font-size: 0.95rem;">
+            ${hookList}
+          </div>
 
           <h4 class="section-label" style="margin:14px 0 8px">🎙 Skrip Voice Over — ${LANG_LABELS[lang] || lang}</h4>
           <div class="vo-script-box" id="voBox${i}">
@@ -309,6 +322,11 @@ function copyVO(i) {
 function copyFullClip(i) {
   const clip = currentClips[i];
   if (!clip) return;
+
+  const hookText = (clip.hooks && clip.hooks.length > 0) 
+    ? clip.hooks.map((h, idx) => `${idx + 1}. "${h}"`).join('\n')
+    : `"${clip.hook || '-'}"`;
+
   const txt =
 `=== KLIP ${clip.id}: ${clip.title} ===
 Timestamp : ${clip.timestamp_start} → ${clip.timestamp_end}
@@ -317,8 +335,8 @@ Durasi    : ${clip.duration_seconds} detik  |  Hype: ${clip.hype_level}/5
 DESKRIPSI ADEGAN:
 ${clip.scene_description}
 
-HOOK (5 detik pertama):
-"${clip.hook}"
+3 OPSI HOOK (Untuk Teks Layar CapCut):
+${hookText}
 
 SKRIP VOICE OVER:
 ${clip.vo_script}
@@ -390,7 +408,12 @@ function exportAll() {
     out += `Timestamp : ${clip.timestamp_start} → ${clip.timestamp_end} (${clip.duration_seconds}s)\n`;
     out += `Hype      : ${'★'.repeat(clip.hype_level || 3)}\n\n`;
     out += `Deskripsi:\n${clip.scene_description}\n\n`;
-    out += `Hook:\n"${clip.hook}"\n\n`;
+    
+    const hookText = (clip.hooks && clip.hooks.length > 0) 
+      ? clip.hooks.map((h, idx) => `${idx + 1}. "${h}"`).join('\n')
+      : `"${clip.hook || '-'}"`;
+      
+    out += `3 Opsi Hook:\n${hookText}\n\n`;
     out += `VO Script:\n${clip.vo_script}\n\n`;
     out += `Hashtag: ${(clip.hashtags || []).join(' ')}\n`;
     out += `${'─'.repeat(40)}\n\n`;
