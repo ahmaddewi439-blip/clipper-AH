@@ -89,19 +89,18 @@ async function startAnalysis() {
 function buildPrompt(input, lang, tone, count, duration) {
   const toneDesc = TONE_DESC[tone] || 'dramatis';
 
-  return `Kamu adalah seorang film analyst dan content creator ahli untuk short-form video (YouTube Shorts, TikTok, Instagram Reels).
+  return `Kamu adalah seorang master pencerita, film analyst, dan content creator ahli untuk short-form video (YouTube Shorts, TikTok, Reels).
 
 Film/input dari user: "${input}"
 
 Tugasmu:
-Analisis film tersebut dan tentukan ${count} adegan/momen terbaik yang cocok dijadikan short video berdurasi ${duration} detik.
+Analisis film tersebut dan buat ringkasan cerita dalam bentuk ${count} klip berdurasi ${duration} detik. 
+PENTING: Klip HARUS berurutan secara KRONOLOGIS dari awal konflik film hingga klimaks/endingnya, sehingga membentuk satu alur cerita epik yang saling bersambung jika ditonton berurutan.
 
 Prioritaskan adegan dengan:
-- Aksi puncak, pertarungan, atau konfrontasi
-- Momen twist atau pengungkapan mengejutkan
-- Dialog yang powerful/ikonik
-- Momen emosional paling kuat
-- Momen humor terbaik (jika ada)
+- Aksi puncak atau konfrontasi yang menegangkan
+- Momen emosional yang menyayat hati atau membakar semangat penonton
+- Pengungkapan misteri (plot twist) yang mengejutkan
 - Adegan spektakuler secara visual
 
 Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JSON, tidak ada teks lain):
@@ -124,7 +123,7 @@ Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JS
       "timestamp_end": "HH:MM:SS",
       "duration_seconds": ${duration},
       "hype_level": 5,
-      "reason": "alasan kenapa adegan ini cocok jadi short (1 kalimat)",
+      "reason": "alasan kenapa adegan ini penting untuk alur cerita (1 kalimat)",
       "vo_script": "skrip voice over dalam bahasa ${lang} dengan tone ${toneDesc}. Panjang 50-80 kata.",
       "hook": "kalimat pembuka 5 detik pertama yang bikin penonton TIDAK bisa skip",
       "hashtags": ["#tag1", "#tag2", "#tag3"]
@@ -133,12 +132,12 @@ Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JS
 }
 
 Pastikan:
-1. VO script dalam bahasa ${lang} dengan tone ${toneDesc}
-2. Timestamp masuk akal sesuai durasi film
-3. Hype level 1-5 (5 paling seru)
-4. Hook harus SUPER menarik dalam bahasa ${lang}
-5. Klip tersebar merata (awal, tengah, akhir film)
-6. Output HANYA JSON — tidak ada teks lain di luar JSON`;
+1. VO script dalam bahasa ${lang} dengan tone ${toneDesc}.
+2. TANDA BACA VO SANGAT PENTING untuk AI Voice (ElevenLabs): Gunakan elipsis (...) untuk jeda dramatis/menegangkan, tanda seru (!) untuk emosi tinggi atau teriakan, dan koma (,) untuk narasi yang mengalir lambat.
+3. Hook HARUS menggunakan teknik 'Curiosity Gap'. Jangan langsung menyebut nama karakter, gunakan kata ganti misterius yang memancing rasa penasaran (Contoh: "Pria ini tidak menyadari bahwa...", "Momen ketika...", "Apa jadinya jika...").
+4. Klip harus menceritakan alur film dari awal sampai akhir (kronologis).
+5. Hype level 1-5 (5 paling seru).
+6. Output HANYA JSON — tidak ada teks lain di luar JSON.`;
 }
 
 /* ============================================================
