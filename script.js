@@ -178,8 +178,7 @@ async function callClaudeAPI(prompt) {
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|
-```/g, '').trim();
+  const clean = raw.replace(/```json|```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
