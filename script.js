@@ -159,7 +159,7 @@ async function callClaudeAPI(prompt) {
       'anthropic-version' : '2023-06-01',
     },
     body : JSON.stringify({
-      model      : 'claude-sonnet-4-6',
+      model      : 'gemini/gemini-2.5-flash-lite',
       max_tokens : 4000,
       messages   : [{ role: 'user', content: prompt }],
     }),
