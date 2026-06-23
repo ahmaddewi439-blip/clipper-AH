@@ -142,20 +142,23 @@ Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
 
 /* ============================================================
-   CLAUDE API CALL
+   CLAUDE API CALL (Diperbarui ke OpenRouter API)
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g';
-  const KOBOI_BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)';
+  // Masukkan API Key OpenRouter Anda di antara tanda kutip di bawah ini
+  const OPENROUTER_API_KEY = 'KODE_API_OPENROUTER_ANDA_MASUKKAN_DISINI';
+  const BASE_URL = 'https://openrouter.ai/api/v1';
 
-  const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
+  const response = await fetch(BASE_URL + '/chat/completions', {
     method  : 'POST',
     headers : {
       'Content-Type'  : 'application/json',
-      'Authorization' : 'Bearer ' + KOBOI_API_KEY
+      'Authorization' : 'Bearer ' + OPENROUTER_API_KEY,
+      'HTTP-Referer'  : 'https://clipper-ah.vercel.app', 
+      'X-Title'       : 'CineClip AI' 
     },
     body : JSON.stringify({
-      model      : 'gemini/gemini-2.5-flash-lite',
+      model      : 'google/gemini-1.5-flash', // Model yang super cepat dan stabil
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
