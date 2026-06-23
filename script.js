@@ -142,23 +142,20 @@ Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
 
 /* ============================================================
-   CLAUDE API CALL (Diperbarui ke OpenRouter API)
+   CLAUDE API CALL (Kembali ke API Koboi Awal Anda)
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  // Masukkan API Key OpenRouter Anda di antara tanda kutip di bawah ini
-  const OPENROUTER_API_KEY = 'KODE_API_OPENROUTER_ANDA_MASUKKAN_DISINI';
-  const BASE_URL = 'https://openrouter.ai/api/v1';
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; // Key asli Anda yang sudah jalan
+  const KOBOI_BASE_URL = 'https://lite.koboillm.com';
 
-  const response = await fetch(BASE_URL + '/chat/completions', {
+  const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
     headers : {
       'Content-Type'  : 'application/json',
-      'Authorization' : 'Bearer ' + OPENROUTER_API_KEY,
-      'HTTP-Referer'  : 'https://clipper-ah.vercel.app', 
-      'X-Title'       : 'CineClip AI' 
+      'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
-      model      : 'google/gemini-1.5-flash', // Model yang super cepat dan stabil
+      model      : 'gemini/gemini-2.5-flash-lite',
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
@@ -181,7 +178,8 @@ async function callClaudeAPI(prompt) {
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|```/g, '').trim();
+  const clean = raw.replace(/```json|
+```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
