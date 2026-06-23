@@ -84,26 +84,21 @@ async function startAnalysis() {
 }
 
 /* ============================================================
-   PROMPT BUILDER
+   PROMPT BUILDER (Versi Anti-Dismon / Reaction & Commentary)
    ============================================================ */
 function buildPrompt(input, lang, tone, count, duration) {
   const toneDesc = TONE_DESC[tone] || 'dramatis';
 
-  return `Kamu adalah seorang master pencerita, film analyst, dan content creator ahli untuk short-form video (YouTube Shorts, TikTok, Reels).
+  return `Kamu adalah kreator YouTube Shorts super sukses yang fokus pada konten "Movie Commentary & Reaction" (Komentar Film). 
+Tujuanmu adalah membuat naskah yang 100% LOLOS MONETISASI YouTube (Transformatif, bukan sekadar Reused Content).
 
 Film/input dari user: "${input}"
 
 Tugasmu:
-Analisis film tersebut dan buat ringkasan cerita dalam bentuk ${count} klip berdurasi ${duration} detik. 
-PENTING: Klip HARUS berurutan secara KRONOLOGIS dari awal konflik film hingga klimaks/endingnya, sehingga membentuk satu alur cerita epik yang saling bersambung jika ditonton berurutan.
+Buat ${count} klip berdurasi ${duration} detik secara KRONOLOGIS (dari awal hingga akhir film).
+PENTING: Jangan hanya merangkum adegan! Skrip HARUS berisi opini, reaksi, atau analisis mendalam terhadap adegan tersebut agar bersifat transformatif.
 
-Prioritaskan adegan dengan:
-- Aksi puncak atau konfrontasi yang menegangkan
-- Momen emosional yang menyayat hati atau membakar semangat penonton
-- Pengungkapan misteri (plot twist) yang mengejutkan
-- Adegan spektakuler secara visual
-
-Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JSON, tidak ada teks lain):
+Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JSON):
 
 {
   "movie": {
@@ -111,33 +106,34 @@ Untuk SETIAP klip, berikan output dalam format JSON PERSIS seperti ini (HANYA JS
     "year": "tahun",
     "genre": ["genre1", "genre2"],
     "director": "sutradara",
-    "description": "sinopsis singkat 2 kalimat",
+    "description": "sinopsis singkat",
     "total_duration": "durasi total"
   },
   "clips": [
     {
       "id": 1,
       "title": "judul singkat adegan",
-      "scene_description": "deskripsi visual adegan (2-3 kalimat)",
+      "scene_description": "deskripsi visual adegan untuk direkam dari film",
       "timestamp_start": "HH:MM:SS",
       "timestamp_end": "HH:MM:SS",
       "duration_seconds": ${duration},
       "hype_level": 5,
-      "reason": "alasan kenapa adegan ini penting untuk alur cerita (1 kalimat)",
-      "vo_script": "skrip voice over dalam bahasa ${lang} dengan tone ${toneDesc}. Panjang 50-80 kata.",
-      "hook": "kalimat pembuka 5 detik pertama yang bikin penonton TIDAK bisa skip",
+      "reason": "alasan kenapa adegan ini layak dikomentari",
+      "vo_script": "skrip voice over commentary",
+      "hook": "kalimat pembuka 5 detik pertama",
       "hashtags": ["#tag1", "#tag2", "#tag3"]
     }
   ]
 }
 
-Pastikan:
-1. VO script dalam bahasa ${lang} dengan tone ${toneDesc}.
-2. TANDA BACA VO SANGAT PENTING untuk AI Voice (ElevenLabs): Gunakan elipsis (...) untuk jeda dramatis/menegangkan, tanda seru (!) untuk emosi tinggi atau teriakan, dan koma (,) untuk narasi yang mengalir lambat.
-3. Hook HARUS menggunakan teknik 'Curiosity Gap'. Jangan langsung menyebut nama karakter, gunakan kata ganti misterius yang memancing rasa penasaran (Contoh: "Pria ini tidak menyadari bahwa...", "Momen ketika...", "Apa jadinya jika...").
-4. Klip harus menceritakan alur film dari awal sampai akhir (kronologis).
-5. Hype level 1-5 (5 paling seru).
-6. Output HANYA JSON — tidak ada teks lain di luar JSON.`;
+ATURAN WAJIB UNTUK HOOK DAN VO SCRIPT (ANTI-DISMON):
+1. GAYA BAHASA TONGKRONGAN: Gunakan bahasa tutur Indonesia yang sangat kasual dan natural (contoh: "nggak", "kayak", "cowok ini", "gila banget", "coba deh perhatiin"). JANGAN KAKU.
+2. BERIKAN OPINI/ANALISIS: Sisipkan reaksi manusiawi. Contoh format yang disukai: "Kalian sadar nggak sih kalau...", "Sumpah, gue merinding banget pas adegan ini...", atau "Ini adalah keputusan paling bodoh yang dia ambil...".
+3. TANDA BACA UNTUK ELEVENLABS: Gunakan elipsis (...) untuk jeda mikir/tegang, dan tanda seru (!) untuk nge-gas atau emosi.
+4. ARAHAN KAMERA (AKTING): Di dalam vo_script, sisipkan teks di dalam kurung siku sebagai arahan untuk kreator yang tampil di depan kamera. Contoh: "[Geleng-geleng kepala] Sumpah cowok ini nekat banget... [Tunjuk ke atas] Kalian lihat deh apa yang dia pegang!"
+5. HOOK CURIOSITY GAP: Buat penonton berhenti nge-scroll di detik pertama tanpa menyebut nama karakter langsung.
+
+Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
 
 /* ============================================================
