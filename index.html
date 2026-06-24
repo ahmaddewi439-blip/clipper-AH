@@ -24,13 +24,29 @@
 
   <!-- ── INPUT SECTION ── -->
   <div class="input-section">
-    <p class="section-label">Ubah Film Menjadi 10 Short Viral Secara Otomatis Dengan AI</p>
+    <p class="section-label">Ubah Film Menjadi Short Viral Secara Otomatis Dengan AI</p>
 
-    <div class="url-row">
-      <input class="url-input" id="movieInput" type="text"
-        placeholder="Contoh: Avengers Endgame, The Dark Knight, Laskar Pelangi…">
-      <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()">▶ ANALISIS</button>
+    <!-- === KOTAK INPUT 2 KARTU BARU === -->
+    <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; background: #121212; padding: 20px; border-radius: 12px; border: 1px solid #222;">
+      
+      <!-- Kotak 1: Judul -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">1. JUDUL FILM & TAHUN</label>
+        <input type="text" id="movieTitle" placeholder="Misal: Don't Breathe a Word (2026)" style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; outline: none; box-sizing: border-box;">
+      </div>
+
+      <!-- Kotak 2: Sinopsis -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">2. SINOPSIS LK21 (AGAR AI TIDAK NGARANG)</label>
+        <textarea id="movieSynopsis" placeholder="Paste sinopsis lengkap dari LK21 di sini..." style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; min-height: 120px; resize: vertical; outline: none; font-family: inherit; box-sizing: border-box;"></textarea>
+      </div>
+
+      <!-- Tombol Analisis -->
+      <button id="analyzeBtn" onclick="startAnalysis()" style="padding: 16px; border-radius: 8px; background: #ff4500; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; transition: 0.2s;">
+        ▶ ANALISIS SEKARANG
+      </button>
     </div>
+    <!-- === AKHIR KOTAK INPUT === -->
 
     <div class="options-row">
       <div class="opt-group">
@@ -82,7 +98,7 @@
 
 <div class="hint-box">
     💡 <strong>Cara pakai:</strong>
-    Masukkan judul film (mis. "Oppenheimer" atau "The Dark Knight"). AI akan menemukan adegan terbaik & membuat skrip VO siap pakai untuk short video. Timestamp + command ffmpeg disediakan otomatis.
+    Masukkan judul film dan paste sinopsis aslinya. AI akan menemukan adegan terbaik & membuat skrip VO siap pakai untuk short video.
 </div>
   </div>
 
