@@ -129,7 +129,7 @@ async function callKoboiAPI(prompt) {
       'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
-      model      : 'gpt-4o', 
+      model      : 'openai/gpt-4o', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
