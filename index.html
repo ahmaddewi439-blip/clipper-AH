@@ -1,149 +1,51 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineClip — AI Movie Clip Analyzer</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-</head>
-<body>
-
-<!-- FILM GRAIN OVERLAY via CSS -->
-
-<header>
-  <div class="logo-strip">
-    <span></span><span></span><span></span>
-  </div>
-  <h1>CINE<em>CLIP</em></h1>
-  <div class="badge">AI Powered</div>
-</header>
-
-<main>
-
-  <!-- ── INPUT SECTION ── -->
-  <div class="input-section">
-    <p class="section-label">Ubah Film Menjadi Short Viral Secara Otomatis Dengan AI</p>
-
-    <!-- === KOTAK INPUT 2 KARTU BARU === -->
-    <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; background: #121212; padding: 20px; border-radius: 12px; border: 1px solid #222;">
-      
-      <!-- Kotak 1: Judul -->
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">1. JUDUL FILM & TAHUN</label>
-        <input type="text" id="movieTitle" placeholder="Misal: Don't Breathe a Word (2026)" style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; outline: none; box-sizing: border-box;">
-      </div>
-
-      <!-- Kotak 2: Sinopsis -->
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">2. SINOPSIS LK21 (AGAR AI TIDAK NGARANG)</label>
-        <textarea id="movieSynopsis" placeholder="Paste sinopsis lengkap dari LK21 di sini..." style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; min-height: 120px; resize: vertical; outline: none; font-family: inherit; box-sizing: border-box;"></textarea>
-      </div>
-
-      <!-- Tombol Analisis -->
-      <button id="analyzeBtn" onclick="startAnalysis()" style="padding: 16px; border-radius: 8px; background: #ff4500; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; transition: 0.2s;">
-        ▶ ANALISIS SEKARANG
+<!-- === MENU TUTORIAL CAPCUT (VERSI FULL DETIL & SPESIFIK) === -->
+    <div style="margin-bottom: 25px;">
+      <button onclick="const t = document.getElementById('tutorialCapcut'); t.style.display = t.style.display === 'none' ? 'block' : 'none';" style="width: 100%; padding: 14px; border-radius: 8px; background: #2ecc71; color: #121212; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);">
+        📚 BUKA TUTORIAL CAPCUT (FULL TRIK LOLOS MONETISASI)
       </button>
-    </div>
-    <!-- === AKHIR KOTAK INPUT === -->
 
-    <div class="options-row">
-      <div class="opt-group">
-        <span class="opt-label">Bahasa VO</span>
-        <select id="voLang">
-          <option value="Indonesia">🇮🇩 Indonesia</option>
-          <option value="English">🇺🇸 English</option>
-          <option value="Melayu">🇲🇾 Melayu</option>
-          <option value="Jawa">☕ Jawa</option>
-          <option value="Sunda">🌿 Sunda</option>
-          <option value="Japanese">🇯🇵 Japanese</option>
-          <option value="Korean">🇰🇷 Korean</option>
-          <option value="Spanish">🇪🇸 Spanish</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <span class="opt-label">Tone VO</span>
-        <select id="voTone">
-          <option value="dramatic">🎭 Dramatis</option>
-          <option value="hype">🔥 Hype / Energik</option>
-          <option value="suspense">😱 Suspense</option>
-          <option value="emotional">💔 Emosional</option>
-          <option value="comedy">😂 Komedi</option>
-          <option value="documentary">🎙️ Dokumenter</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <span class="opt-label">Jumlah Klip</span>
-        <select id="clipCount">
-          <option value="5">5 klip</option>
-          <option value="7" selected>7 klip</option>
-          <option value="10">10 klip</option>
-        </select>
-      </div>
-      <div class="opt-group">
-        <span class="opt-label">Durasi / Klip</span>
-        <select id="clipDuration">
-          <option value="45">45 detik</option>
-          <option value="60" selected>60 detik</option>
-          <option value="90">90 detik</option>
-        </select>
-      </div>
-    </div>
+      <div id="tutorialCapcut" style="display: none; background: #121212; padding: 25px; border-radius: 12px; border: 1px solid #2ecc71; margin-top: 15px; color: #ddd; line-height: 1.7; text-align: left; font-size: 0.95rem;">
+        
+        <h2 style="color: #2ecc71; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-size: 1.8rem;">🛡️ PANDUAN EDITING ANTI-REUSED CONTENT (FULL)</h2>
+        <p style="margin-top: 0; margin-bottom: 20px; font-size: 0.9rem; color: #999;">Untuk meloloskan video dari deteksi Konten yang Digunakan Ulang, AI YouTube harus membaca "Signifikan Alterasi" (perubahan besar) dari video aslinya. Ikuti setiap langkah di CapCut ini:</p>
 
-   <div class="hint-box">
-    <strong>Kegunaan:</strong>
-    CineClip AI akan mencari adegan terbaik, membuat script voice over, dan menghasilkan short video siap upload.
-</div>
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.1rem; border-left: 3px solid #ff4500; padding-left: 10px;">1. TRIK MENGAKALI VISUAL (VIDEO EDITING)</h4>
+        <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 20px; color: #bbb;">
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Teknik Potong & Susun Ulang (Cutting):</strong> Jangan pernah membiarkan satu potongan klip film berjalan lebih dari <strong>3 hingga 5 detik</strong> tanpa potongan (cut). Buatlah potongan yang padat. Susun alurnya sedikit melompat jika memungkinkan, agar tidak 100% sama dengan linimasa film aslinya.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Zoom In & Re-framing:</strong> Naikkan skala (scale) video asli sekitar <strong>5% hingga 10%</strong> di CapCut, lalu geser sedikit posisinya ke kiri atau kanan. Langkah ini otomatis mengubah koordinat piksel yang dibaca oleh bot deteksi hak cipta.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Gunakan Fitur Mirroring Secara Selektif:</strong> Untuk adegan-adegan yang tidak menampilkan teks/tulisan atau posisi tangan yang krusial, gunakan fitur <strong>Mirror</strong> (Pembalikan arah horizontal). Ini cara paling efektif mengecoh deteksi visual otomatis.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Manipulasi Kecepatan (Speed Alteration):</strong> Ubah kecepatan video asli secara tipis. Naikkan menjadi <strong>1.03x</strong> atau turunkan menjadi <strong>0.97x</strong>. Perubahan minor ini tidak disadari mata manusia, tetapi merusak struktur frame rate di mata AI.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Color Grading & Overlay Filter:</strong> Masuk ke menu <strong>Adjust</strong> di CapCut. Ubah Saturation (+5), Contrast (+3), dan Sharpen (+10). Wajib gunakan filter warna tambahan agar palet warna video berubah total dari aslinya.</li>
+        </ul>
 
-<div class="hint-box">
-    💡 <strong>Cara pakai:</strong>
-    Masukkan judul film dan paste sinopsis aslinya. AI akan menemukan adegan terbaik & membuat skrip VO siap pakai untuk short video.
-</div>
-  </div>
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.1rem; border-left: 3px solid #ff4500; padding-left: 10px;">2. TRIK MENGAKALI AUDIO (SANGAT KRUSIAL)</h4>
+        <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 20px; color: #bbb;">
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Matikan/Kecilkan Suara Asli:</strong> Trik paling aman adalah menurunkan volume klip film asli hingga <strong>0% (Mute)</strong>. Audio asli adalah pemicu klaim paling sensitif.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Dialog Asli Hanya Untuk Efek:</strong> Jika terpaksa memunculkan dialog asli karakter, potong klip suara tersebut maksimal <strong>2 detik saja</strong>. Jangan biarkan dialog film berjalan panjang tanpa ditimpa suara Anda.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Wajib Dominasi Voice Over (VO):</strong> Suara manusia asli atau AI berlisensi harus mendominasi dari awal sampai akhir. (Gunakan skrip 130 kata/menit dari CineClip).</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Backsound Bebas Hak Cipta:</strong> Gunakan musik dari YouTube Audio Library. Atur volumenya sangat pelan (<strong>-20dB hingga -25dB</strong>) agar tidak menabrak VO, tapi cukup untuk mengaburkan sisa frekuensi audio film.</li>
+        </ul>
 
-  <div class="error-box" id="errorBox"></div>
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.1rem; border-left: 3px solid #ff4500; padding-left: 10px;">3. TEKNIK BLUR (SENJATA RAHASIA)</h4>
+        <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 20px; color: #bbb;">
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Blur Logo & Watermark (Wajib):</strong> Jika klip film punya watermark LK21 atau stasiun TV, tutupi! Buka <i>Effects > Video Effects > Lens > Blur</i>. Gunakan fitur <i>Mask (Circle/Rectangle)</i> arahkan tepat ke logo tersebut. AI YouTube melacak keaslian dari logo ini.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Blur Background (Teknik Layering):</strong> Jika video asli berasio 16:9, jangan biarkan atas-bawahnya hitam kosong. Duplikat klip, letakkan di layer bawah, perbesar sampai memenuhi layar 9:16, lalu beri efek <strong>Blur (30-50%)</strong>. Klip utama biarkan di atasnya.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Blur Teks Tidak Relevan:</strong> Jika ada teks subtitle bawaan film yang tidak bisa dihilangkan, beri efek Blur tipis di atasnya agar bot tidak bisa membaca teks tersebut.</li>
+        </ul>
 
-  <!-- ── PROGRESS ── -->
-  <div class="progress-area" id="progressArea">
-    <div class="progress-card">
-      <div class="progress-title">⚙ MEMPROSES FILM…</div>
-      <div class="step-list" id="stepList">
-        <div class="step" id="step1"><div class="step-icon">1</div><span>Membaca informasi &amp; metadata film</span></div>
-        <div class="step" id="step2"><div class="step-icon">2</div><span>Mengidentifikasi adegan paling seru &amp; emosional</span></div>
-        <div class="step" id="step3"><div class="step-icon">3</div><span>Menentukan timestamp optimal untuk short</span></div>
-        <div class="step" id="step4"><div class="step-icon">4</div><span>Menulis skrip Voice-Over dalam bahasa pilihan</span></div>
-        <div class="step" id="step5"><div class="step-icon">5</div><span>Menyusun panduan editing &amp; export</span></div>
-      </div>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar" id="progressBar"></div>
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.1rem; border-left: 3px solid #ff4500; padding-left: 10px;">4. ELEMEN TAMBAHAN (OVERLAY & TEKS)</h4>
+        <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 20px; color: #bbb;">
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Teks Statis Atas-Bawah:</strong> Pasang Judul di atas dan Hook Teks di bawah layar secara konstan (seperti panduan CineClip AI). Ini mengubah rasio fokus video di mata sistem otomatis.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Transisi Pop-Up Halus:</strong> Setiap perpindahan klip (per 3-5 detik), berikan efek transisi seperti <i>Bleach</i>, <i>Flash</i>, atau <i>Black Fade</i> dengan durasi sangat tipis (0.1s).</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #ff9f43;">Reaksi Visual (B-Roll):</strong> Selipkan gambar stiker panah, lingkaran merah, atau animasi untuk menunjuk detail tertentu di layar. Ini memberi kesan "Bedah Edukasi", bukan sekadar re-upload.</li>
+        </ul>
+
+        <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.1rem; border-left: 3px solid #3498db; padding-left: 10px;">💡 TIPS EKSTRA JAMINAN MONETISASI (FAIR USE)</h4>
+        <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 0; color: #bbb;">
+          <li style="margin-bottom: 6px;"><strong style="color: #3498db;">Komentar Opini Pribadi:</strong> YouTube sangat menyukai "Nilai Tambah". Pastikan Anda menyelipkan kalimat opini di Voice Over Anda, misal: <i>"Menurut gua adegan ini gila banget sih..."</i> atau <i>"Perhatikan baik-baik tangan kirinya..."</i>. Ini membuktikan Anda adalah seorang "Komentator", bukan pembajak film.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: #3498db;">Facecam Kecil (Opsional tapi Sangat Kuat):</strong> Jika Anda berani, rekam wajah Anda sedang bereaksi/membaca naskah, potong bentuk lingkaran kecil (menggunakan fitur Mask), dan letakkan di pojok layar. Kehadiran wajah manusia asli adalah tameng terkuat dari penolakan monetisasi.</li>
+        </ul>
+
       </div>
     </div>
-  </div>
-
-  <!-- ── RESULTS ── -->
-  <div class="results-area" id="resultsArea">
-    <div class="results-header">
-      <div class="results-title">KLIP <span>TERPILIH</span></div>
-      <button class="export-all-btn" onclick="exportAll()">⬇ Export Semua Script</button>
-    </div>
-    <div class="movie-meta" id="movieMeta"></div>
-    <div class="clips-grid" id="clipsGrid"></div>
-  </div>
-
-</main>
-
-<!-- ── EXPORT MODAL ── -->
-<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <h3>PANDUAN EXPORT</h3>
-    <div id="modalContent"></div>
-  </div>
-</div>
-
-<footer>CineClip AI — Powered by Ahmad Syahroni · Analisis adegan &amp; skrip VO otomatis</footer>
-
-<script src="script.js"></script>
-</body>
-</html>
+    <!-- === AKHIR MENU TUTORIAL === -->
