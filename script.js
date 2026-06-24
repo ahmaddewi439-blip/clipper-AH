@@ -1,5 +1,5 @@
 /* ============================================================
-   CineClip AI — script.js (VERSI 2 KOTAK INPUT + VO 1 MENIT PAS)
+   CineClip AI — script.js (VERSI FIX MULTI-CLIP & IMPROVISASI)
    ============================================================ */
 
 'use strict';
@@ -13,7 +13,6 @@ const LANG_LABELS = {
 };
 
 async function startAnalysis() {
-  // Mengambil data dari 2 kotak yang baru dibuat
   const title = document.getElementById('movieTitle')?.value.trim();
   const synopsis = document.getElementById('movieSynopsis')?.value.trim();
   
@@ -69,7 +68,6 @@ async function startAnalysis() {
 }
 
 function buildPrompt(title, synopsis, lang, tone, count, duration) {
-  // RUMUS RAHASIA: Rata-rata manusia bicara 130 kata per 60 detik (sekitar 2.1 - 2.2 kata per detik)
   const targetWords = Math.floor(duration * 2.2);
 
   return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary".
@@ -78,9 +76,9 @@ JUDUL FILM: "${title}"
 SINOPSIS DARI USER: "${synopsis}"
 
 ATURAN KETAT (WAJIB PATUH):
-1. JANGAN MENGARANG CERITA FIKTIF! Kembangkan adegan HANYA dari detail SINOPSIS DARI USER di atas.
-2. PANJANG SCRIPT VO: User meminta durasi klip ${duration} detik. Oleh karena itu, panjang teks pada bagian "vo_script" HARUS PAS DAN MENDETAIL, sekitar ${targetWords} KATA! JANGAN buat naskah yang terlalu pendek. Jabarkan suasananya!
-3. Buat ${count} klip berdasarkan urutan cerita.
+1. JUMLAH KLIP: Kamu WAJIB menghasilkan TEPAT ${count} klip dalam array "clips". JANGAN KURANG! Pecah alur cerita sinopsis di atas menjadi ${count} bagian (misal: pengenalan, konflik 1, konflik 2, misteri, klimaks, dll).
+2. IZIN IMPROVISASI: Karena sinopsisnya singkat, kamu DIIZINKAN berimprovisasi membayangkan adegan visual, menambah detail suasana tegang, dan memperkaya narasi agar durasi terpenuhi. Syaratnya: Inti cerita harus tetap sesuai dengan sinopsis!
+3. PANJANG SCRIPT VO: Untuk memenuhi durasi ${duration} detik, naskah "vo_script" HARUS sangat detail dan panjang, sekitar ${targetWords} KATA per klip!
 
 Output HARUS format JSON (HANYA JSON):
 {
@@ -110,7 +108,7 @@ Output HARUS format JSON (HANYA JSON):
           "Opsi 3 hook"
         ]
       },
-      "vo_script": "Skrip VO bahasa Indonesia kasual. Wajib panjang sekitar ${targetWords} kata sesuai hitungan durasi.",
+      "vo_script": "Skrip VO bahasa Indonesia kasual. Wajib panjang sekitar ${targetWords} kata.",
       "hashtags": ["#tag1", "#tag2"]
     }
   ]
@@ -118,8 +116,8 @@ Output HARUS format JSON (HANYA JSON):
 }
 
 async function callKoboiAPI(prompt) {
-  // --- PASTIKAN API KEY KOBOI GPT-4o ANDA ADA DI SINI ---
-  const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';  
+  // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
+  const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';   
   const BASE_URL = 'https://lite.koboillm.com'; 
 
   const response = await fetch(BASE_URL + '/v1/chat/completions', {
@@ -177,7 +175,7 @@ function renderResults(data, lang, duration) {
     return `
     <div class="clip-card" id="clipCard${i}">
       <div class="clip-header" onclick="toggleClip(${i})">
-        <div class="clip-num">0${clip.id}</div>
+        <div class="clip-num">0${clip.id || i+1}</div>
         <div class="clip-meta">
           <div class="clip-title">${clip.title}</div>
         </div>
@@ -274,7 +272,6 @@ function showError(msg) {
 }
 function hideError() { document.getElementById('errorBox').classList.remove('active'); }
 
-// Update event listener untuk text area
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('movieTitle').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
