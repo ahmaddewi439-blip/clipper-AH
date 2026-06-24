@@ -1,4 +1,28 @@
-<!-- === MENU TUTORIAL CAPCUT (VERSI FULL DETIL & SPESIFIK) === -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineClip — AI Movie Clip Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <div class="logo-strip">
+    <span></span><span></span><span></span>
+  </div>
+  <h1>CINE<em>CLIP</em></h1>
+  <div class="badge">AI Powered</div>
+</header>
+
+<main>
+
+  <div class="input-section">
+    <p class="section-label">Ubah Film Menjadi Short Viral Secara Otomatis Dengan AI</p>
+
     <div style="margin-bottom: 25px;">
       <button onclick="const t = document.getElementById('tutorialCapcut'); t.style.display = t.style.display === 'none' ? 'block' : 'none';" style="width: 100%; padding: 14px; border-radius: 8px; background: #2ecc71; color: #121212; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);">
         📚 BUKA TUTORIAL CAPCUT (FULL TRIK LOLOS MONETISASI)
@@ -48,4 +72,115 @@
 
       </div>
     </div>
-    <!-- === AKHIR MENU TUTORIAL === -->
+    <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; background: #121212; padding: 20px; border-radius: 12px; border: 1px solid #222;">
+      
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">1. JUDUL FILM & TAHUN</label>
+        <input type="text" id="movieTitle" placeholder="Misal: Don't Breathe a Word (2026)" style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; outline: none; box-sizing: border-box;">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">2. SINOPSIS LK21 (AGAR AI TIDAK NGARANG)</label>
+        <textarea id="movieSynopsis" placeholder="Paste sinopsis lengkap dari LK21 di sini..." style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; min-height: 120px; resize: vertical; outline: none; font-family: inherit; box-sizing: border-box;"></textarea>
+      </div>
+
+      <button id="analyzeBtn" onclick="startAnalysis()" style="padding: 16px; border-radius: 8px; background: #ff4500; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; transition: 0.2s;">
+        ▶ ANALISIS SEKARANG
+      </button>
+    </div>
+    <div class="options-row">
+      <div class="opt-group">
+        <span class="opt-label">Bahasa VO</span>
+        <select id="voLang">
+          <option value="Indonesia">🇮🇩 Indonesia</option>
+          <option value="English">🇺🇸 English</option>
+          <option value="Melayu">🇲🇾 Melayu</option>
+          <option value="Jawa">☕ Jawa</option>
+          <option value="Sunda">🌿 Sunda</option>
+          <option value="Japanese">🇯🇵 Japanese</option>
+          <option value="Korean">🇰🇷 Korean</option>
+          <option value="Spanish">🇪🇸 Spanish</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">Tone VO</span>
+        <select id="voTone">
+          <option value="dramatic">🎭 Dramatis</option>
+          <option value="hype">🔥 Hype / Energik</option>
+          <option value="suspense">😱 Suspense</option>
+          <option value="emotional">💔 Emosional</option>
+          <option value="comedy">😂 Komedi</option>
+          <option value="documentary">🎙️ Dokumenter</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">Jumlah Klip</span>
+        <select id="clipCount">
+          <option value="5">5 klip</option>
+          <option value="7" selected>7 klip</option>
+          <option value="10">10 klip</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">Durasi / Klip</span>
+        <select id="clipDuration">
+          <option value="45">45 detik</option>
+          <option value="60" selected>60 detik</option>
+          <option value="90">90 detik</option>
+        </select>
+      </div>
+    </div>
+
+   <div class="hint-box">
+    <strong>Kegunaan:</strong>
+    CineClip AI akan mencari adegan terbaik, membuat script voice over, dan menghasilkan short video siap upload.
+  </div>
+
+  <div class="hint-box">
+      💡 <strong>Cara pakai:</strong>
+      Masukkan judul film dan paste sinopsis aslinya. AI akan menemukan adegan terbaik & membuat skrip VO siap pakai untuk short video.
+  </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="progress-area" id="progressArea">
+    <div class="progress-card">
+      <div class="progress-title">⚙ MEMPROSES FILM…</div>
+      <div class="step-list" id="stepList">
+        <div class="step" id="step1"><div class="step-icon">1</div><span>Membaca informasi &amp; metadata film</span></div>
+        <div class="step" id="step2"><div class="step-icon">2</div><span>Mengidentifikasi adegan paling seru &amp; emosional</span></div>
+        <div class="step" id="step3"><div class="step-icon">3</div><span>Menentukan timestamp optimal untuk short</span></div>
+        <div class="step" id="step4"><div class="step-icon">4</div><span>Menulis skrip Voice-Over dalam bahasa pilihan</span></div>
+        <div class="step" id="step5"><div class="step-icon">5</div><span>Menyusun panduan editing &amp; export</span></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-area" id="resultsArea">
+    <div class="results-header">
+      <div class="results-title">KLIP <span>TERPILIH</span></div>
+      <button class="export-all-btn" onclick="exportAll()">⬇ Export Semua Script</button>
+    </div>
+    <div class="movie-meta" id="movieMeta"></div>
+    <div class="clips-grid" id="clipsGrid"></div>
+  </div>
+
+</main>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>PANDUAN EXPORT</h3>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>CineClip AI — Analisis adegan &amp; skrip VO otomatis</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
