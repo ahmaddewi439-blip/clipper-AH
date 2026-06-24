@@ -116,8 +116,8 @@ Output HARUS format JSON (HANYA JSON):
 async function callKoboiAPI(prompt) {
   // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
   const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw'; 
-  const BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)'; 
-
+  
+  const BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)';
   const response = await fetch(BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
     headers : {
@@ -125,7 +125,7 @@ async function callKoboiAPI(prompt) {
       'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
-      model      : 'openai/gpt-4o', 
+      model      : 'gpt-4o', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
