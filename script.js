@@ -146,7 +146,7 @@ async function callClaudeAPI(prompt) {
     },
     body : JSON.stringify({
       // Menggunakan model Gemini 1.5 Flash (Gratis via OpenRouter)
-      model      : 'google/gemini-1.5-flash:free', 
+      model      : 'google/gemini-2.5-flash:free', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
