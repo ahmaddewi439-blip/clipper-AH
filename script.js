@@ -145,8 +145,8 @@ async function callClaudeAPI(prompt) {
       'X-Title'       : 'CineClip AI' 
     },
     body : JSON.stringify({
-      // Menggunakan model deepseek r1 (Gratis via OpenRouter)
-      model      : 'deepseek/deepseek-r1:free', 
+      // Menggunakan model llama-3.3-70b-instruct (Gratis via OpenRouter)
+      model      : 'meta-llama/llama-3.3-70b-instruct:free', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
