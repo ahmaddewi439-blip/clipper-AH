@@ -1,14 +1,12 @@
 /* ============================================================
-   CineClip AI — script.js
+   CineClip AI — script.js (VERSI GPT-4o & ANTI ERROR COPY)
    ============================================================ */
 
 'use strict';
 
-/* ── State ── */
 let currentClips    = [];
 let currentMovieInfo = {};
 
-/* ── Language display map ── */
 const LANG_LABELS = {
   Indonesia : 'Indonesia',
   English   : 'English',
@@ -20,22 +18,9 @@ const LANG_LABELS = {
   Spanish   : 'Español',
 };
 
-/* ── Tone descriptions (for prompt) ── */
-const TONE_DESC = {
-  dramatic    : 'dramatis dan sinematik',
-  hype        : 'hype, penuh energi, bikin penonton terbakar semangat',
-  suspense    : 'menegangkan dan penuh ketegangan',
-  emotional   : 'emosional, menyentuh hati',
-  comedy      : 'lucu, ringan, menghibur',
-  documentary : 'serius, informatif seperti narasi dokumenter',
-};
-
-/* ============================================================
-   MAIN ENTRY
-   ============================================================ */
 async function startAnalysis() {
   const input = document.getElementById('movieInput').value.trim();
-  if (!input) { showError('Masukkan judul atau URL film terlebih dahulu.'); return; }
+  if (!input) { showError('Masukkan judul atau detail film terlebih dahulu.'); return; }
 
   const voLang       = document.getElementById('voLang').value;
   const voTone       = document.getElementById('voTone').value;
@@ -57,7 +42,7 @@ async function startAnalysis() {
     await activateStep('step4',  600); setProgress(78);
 
     const prompt = buildPrompt(input, voLang, voTone, clipCount, clipDuration);
-    const raw    = await callClaudeAPI(prompt);
+    const raw    = await callKoboiAPI(prompt);
 
     await completeStep('step4');
     await activateStep('step5', 500); setProgress(92);
@@ -76,40 +61,37 @@ async function startAnalysis() {
 
   } catch (e) {
     document.getElementById('progressArea').classList.remove('active');
-    showError('Terjadi kesalahan: ' + e.message + '. Coba ulangi atau masukkan judul film yang lebih spesifik.');
+    showError('Terjadi kesalahan: ' + e.message + ' (Pastikan API Key valid)');
     console.error(e);
   } finally {
     document.getElementById('analyzeBtn').disabled = false;
   }
 }
 
-/* ============================================================
-   PROMPT BUILDER (Versi Anti-Dismon / Reaction & Commentary)
-   ============================================================ */
 function buildPrompt(input, lang, tone, count, duration) {
-  return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary" untuk format vertikal 9:16.
+  return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary".
 
 INFORMASI DARI USER: "${input}"
 
-ATURAN ANTI-HALUSINASI SANGAT KETAT:
-1. JIKA FILM TERLALU BARU: Gunakan 100% detail dari petunjuk yang diketik user. Kembangkan narasi dari petunjuk tersebut, JANGAN MENGARANG cerita/karakter fiktif yang tidak diminta.
+ATURAN KETAT:
+1. JANGAN MENGARANG CERITA. Kembangkan naskah HANYA berdasarkan petunjuk user.
 2. TIMESTAMP: Berikan angka urut saja (misal 00:00:00 -> 00:01:00) sebagai ESTIMASI.
 3. Buat ${count} klip berdurasi ${duration} detik.
 
-Output HARUS format JSON persis seperti ini (HANYA JSON):
+Output HARUS format JSON (HANYA JSON):
 {
   "movie": {
     "title": "Judul film",
     "year": "Tahun",
-    "genre": ["genre1", "genre2"],
-    "director": "Sutradara (atau isi Tidak Diketahui)",
-    "description": "Sinopsis singkat berfokus pada apa yang diminta user",
+    "genre": ["genre1"],
+    "director": "Sutradara",
+    "description": "Sinopsis singkat",
     "total_duration": "Estimasi durasi"
   },
   "clips": [
     {
       "id": 1,
-      "title": "Judul adegan singkat",
+      "title": "Judul adegan",
       "scene_description": "Deskripsi visual adegan",
       "timestamp_start": "00:01:00",
       "timestamp_end": "00:02:00",
@@ -117,43 +99,40 @@ Output HARUS format JSON persis seperti ini (HANYA JSON):
       "hype_level": 5,
       "reason": "Alasan adegan ini menarik",
       "teks_statis_capcut": {
-        "judul_atas": "JUDUL ATAS LAYAR (Maks 4 kata kapital)",
+        "judul_atas": "JUDUL ATAS (Maks 4 kata kapital)",
         "opsi_hook_bawah": [
-          "Opsi 1 hook teks bawah (Maks 6 kata, penasaran)",
-          "Opsi 2 hook teks bawah (Maks 6 kata, provokatif)",
-          "Opsi 3 hook teks bawah (Maks 6 kata, pertanyaan)"
+          "Opsi 1 hook",
+          "Opsi 2 hook",
+          "Opsi 3 hook"
         ]
       },
-      "vo_script": "Skrip VO gaya bahasa Indonesia kasual (nggak, kayak, gila banget).",
+      "vo_script": "Skrip VO bahasa Indonesia kasual dan asik.",
       "hashtags": ["#tag1", "#tag2"]
     }
   ]
 }`;
 }
 
-async function callClaudeAPI(prompt) {
-  // --- MASUKKAN KODE API OPENROUTER ANDA DI BAWAH INI ---
-  const OPENROUTER_API_KEY = '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'; 
-  const BASE_URL = 'https://openrouter.ai/api/v1';
+async function callKoboiAPI(prompt) {
+  // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
+  const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw'; 
+  const BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)'; 
 
-  const response = await fetch(BASE_URL + '/chat/completions', {
+  const response = await fetch(BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
     headers : {
       'Content-Type'  : 'application/json',
-      'Authorization' : 'Bearer ' + OPENROUTER_API_KEY,
-      'HTTP-Referer'  : 'https://clipper-ah.vercel.app', 
-      'X-Title'       : 'CineClip AI' 
+      'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
-      // Menggunakan model openrouter auto Gratis via OpenRouter)
-      model      : 'openrouter/auto', 
+      model      : 'openai/gpt-4o', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error('OpenRouter Error: ' + (err.error?.message || response.status));
+    throw new Error('API Error: ' + (err.error?.message || response.status));
   }
 
   const data = await response.json();
@@ -164,54 +143,40 @@ async function callClaudeAPI(prompt) {
   }
 }
 
-/* ============================================================
-   PARSE RESPONSE
-   ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|```/g, '').trim();
-  try {
-    return JSON.parse(clean);
-  } catch (_) {
+  // Cara aman menghapus backtick tanpa memicu error saat di copy-paste
+  let clean = raw.replace(new RegExp('\`{3}json', 'g'), '').replace(new RegExp('\`{3}', 'g'), '').trim();
+  try { return JSON.parse(clean); } 
+  catch (_) {
     const match = clean.match(/\{[\s\S]*\}/);
     if (match) return JSON.parse(match[0]);
-    throw new Error('Format respons tidak valid. Coba ulangi.');
+    throw new Error('Format JSON dari AI tidak valid. Ulangi kembali.');
   }
 }
 
-/* ============================================================
-   RENDER RESULTS
-   ============================================================ */
 function renderResults(data, lang, duration) {
   const { movie, clips } = data;
-
-  /* ── Movie meta ── */
   const metaEl = document.getElementById('movieMeta');
   metaEl.innerHTML = `
     <div class="movie-poster">🎬</div>
     <div class="movie-info">
-      <h2>${movie.title} (${movie.year || ''})</h2>
+      <div style="background: rgba(46, 204, 113, 0.15); color: #2ecc71; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; border: 1px solid #2ecc71; display: inline-block;">🧠 POWERED BY: KOBOI API (GPT-4o)</div>
+      <h2 style="margin-top:0;">${movie.title} (${movie.year || ''})</h2>
       <p>${movie.description || ''}</p>
-      <div class="movie-tags">
-        ${(movie.genre || []).map(g => `<span class="tag">${g}</span>`).join('')}
-        <span class="tag hot">▶ ${clips.length} Klip</span>
-        <span class="tag">⏱ ${duration}s / klip</span>
-        <span class="tag">🌐 VO: ${LANG_LABELS[lang] || lang}</span>
-      </div>
     </div>
   `;
 
-  /* ── Clip cards ── */
   const grid = document.getElementById('clipsGrid');
   grid.innerHTML = clips.map((clip, i) => {
     const flames = '🔥'.repeat(Math.min(clip.hype_level || 3, 5));
+    const ts = clip.teks_statis_capcut || { judul_atas: clip.title, opsi_hook_bawah: ["Hook 1", "Hook 2", "Hook 3"] };
+
     return `
     <div class="clip-card" id="clipCard${i}">
-
       <div class="clip-header" onclick="toggleClip(${i})">
         <div class="clip-num">0${clip.id}</div>
         <div class="clip-meta">
           <div class="clip-title">${clip.title}</div>
-          <div class="clip-subtitle">${clip.reason || ''}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <div class="clip-duration-badge">${clip.timestamp_start} → ${clip.timestamp_end}</div>
@@ -219,193 +184,58 @@ function renderResults(data, lang, duration) {
         </div>
         <div class="chevron">▼</div>
       </div>
-
       <div class="clip-body">
-        <div class="clip-body-grid">
-          <div class="info-block">
-            <h4>Timestamp</h4>
-            <div class="timestamp-bar">
-              <span>${clip.timestamp_start}</span>
-              <span class="ts-arrow">──────►</span>
-              <span>${clip.timestamp_end}</span>
-            </div>
-          </div>
-          <div class="info-block">
-            <h4>Durasi &amp; Hype</h4>
-            <div class="timestamp-bar">
-              <span>⏱ ${clip.duration_seconds || duration} detik</span>
-              <span style="color:var(--gold)">🔥 ${clip.hype_level || '?'}/5</span>
-            </div>
-          </div>
-        </div>
-
         <div class="info-block" style="margin-top:12px">
           <h4>Deskripsi Adegan</h4>
           <div class="scene-desc">${clip.scene_description || '-'}</div>
         </div>
+        
+        <div class="info-block" style="margin-top:14px; background: rgba(255, 69, 0, 0.08); border-left: 3px solid var(--primary); padding: 14px;">
+          <h4 style="color: var(--primary); margin-bottom: 10px;">📱 Teks Statis CapCut</h4>
+          <div style="font-family: monospace; font-size: 0.95rem; line-height: 1.6;">
+            <div style="color: #fff; margin-bottom: 6px;">
+              <strong>[TEKS ATAS]:</strong> <span style="color:var(--gold);">${ts.judul_atas}</span>
+            </div>
+            <div style="color: #fff;"><strong>[TEKS BAWAH] Pilih 1 Hook:</strong></div>
+            <ul style="margin: 4px 0 0 20px; color: var(--accent2);">
+              <li>"${ts.opsi_hook_bawah[0] || '-'}"</li>
+              <li>"${ts.opsi_hook_bawah[1] || '-'}"</li>
+              <li>"${ts.opsi_hook_bawah[2] || '-'}"</li>
+            </ul>
+          </div>
+        </div>
 
-        <div class="vo-section">
-          <h4 class="section-label" style="margin:14px 0 8px">🎙 Hook Pembuka (5 detik pertama)</h4>
-          <div class="scene-desc" style="color:var(--accent2);font-style:italic">"${clip.hook || '-'}"</div>
-
-          <h4 class="section-label" style="margin:14px 0 8px">🎙 Skrip Voice Over — ${LANG_LABELS[lang] || lang}</h4>
+        <div class="vo-section" style="margin-top: 14px;">
+          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip Voice Over</h4>
           <div class="vo-script-box" id="voBox${i}">
             <button class="vo-copy-btn" id="copyBtn${i}" onclick="copyVO(${i})">COPY</button>
             <div class="vo-text">${clip.vo_script || '-'}</div>
           </div>
         </div>
-
-        <div class="info-block" style="margin-top:12px">
-          <h4>Hashtag</h4>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            ${(clip.hashtags || []).map(t => `<span class="tag">${t}</span>`).join('')}
-          </div>
-        </div>
-
-        <div class="clip-actions">
-          <button class="clip-action-btn primary" onclick="showExport(${i})">⬇ Panduan Export</button>
-          <button class="clip-action-btn" onclick="copyVO(${i})">📋 Copy VO Script</button>
-          <button class="clip-action-btn" onclick="copyFullClip(${i})">📄 Copy Semua Info</button>
-        </div>
       </div>
-
     </div>`;
   }).join('');
 }
 
-/* ============================================================
-   TOGGLE CLIP
-   ============================================================ */
 function toggleClip(i) {
   document.getElementById('clipCard' + i).classList.toggle('open');
 }
 
-/* ============================================================
-   COPY HELPERS
-   ============================================================ */
 function copyVO(i) {
   const clip = currentClips[i];
   if (!clip) return;
-  
-  // Mengabaikan teks di dalam kurung siku [...] agar ElevenLabs tidak ikut membacanya
   const cleanVO = (clip.vo_script || '').replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim();
-
   navigator.clipboard.writeText(cleanVO).then(() => {
     const btn = document.getElementById('copyBtn' + i);
     if (btn) {
       btn.textContent = '✓ COPIED';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+      setTimeout(() => { btn.textContent = 'COPY'; }, 2000);
     }
-  }).catch(() => alert('Tekan Ctrl+C setelah teks diseleksi.'));
-}
-
-function copyFullClip(i) {
-  const clip = currentClips[i];
-  if (!clip) return;
-  const txt =
-`=== KLIP ${clip.id}: ${clip.title} ===
-Timestamp : ${clip.timestamp_start} → ${clip.timestamp_end}
-Durasi    : ${clip.duration_seconds} detik  |  Hype: ${clip.hype_level}/5
-
-DESKRIPSI ADEGAN:
-${clip.scene_description}
-
-HOOK (5 detik pertama):
-"${clip.hook}"
-
-SKRIP VOICE OVER:
-${clip.vo_script}
-
-HASHTAG: ${(clip.hashtags || []).join(' ')}
-`;
-  navigator.clipboard.writeText(txt)
-    .then(() => alert('✓ Semua info klip berhasil dicopy!'))
-    .catch(() => alert(txt));
-}
-
-/* ============================================================
-   EXPORT MODAL
-   ============================================================ */
-function showExport(i) {
-  const clip = currentClips[i];
-  const name = (clip.title || 'scene').replace(/\s+/g, '_');
-
-  document.getElementById('modalContent').innerHTML = `
-    <p style="color:var(--dim);font-size:.8rem;line-height:1.7;margin-bottom:12px">
-      Gunakan perintah ffmpeg berikut untuk memotong klip ini dari file video lokal:
-    </p>
-    <div class="ffmpeg-block">ffmpeg -i "nama_film.mp4" \\
-  -ss ${clip.timestamp_start} \\
-  -to ${clip.timestamp_end} \\
-  -c:v libx264 -c:a aac \\
-  -vf "scale=1080:1920:force_original_aspect_ratio=decrease,\\
-pad=1080:1920:(ow-iw)/2:(oh-ih)/2" \\
-  "klip_${clip.id}_${name}.mp4"</div>
-    <p class="modal-note">
-      📱 <strong>Format:</strong> Output 9:16 (1080×1920) siap untuk Shorts / Reels / TikTok.<br>
-      🎙 <strong>VO:</strong> Rekam voice over lalu gabungkan dengan CapCut / DaVinci Resolve / Premiere.<br>
-      ⚡ <strong>Tips:</strong> Tambahkan subtitle auto-generate di CapCut untuk engagement lebih tinggi.
-    </p>
-    <div class="clip-actions" style="margin-top:16px">
-      <button class="clip-action-btn primary" onclick="copyFFmpeg(${i})">📋 Copy Command ffmpeg</button>
-    </div>
-  `;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-
-function copyFFmpeg(i) {
-  const clip = currentClips[i];
-  const name = (clip.title || 'scene').replace(/\s+/g, '_');
-  const cmd  =
-`ffmpeg -i "nama_film.mp4" -ss ${clip.timestamp_start} -to ${clip.timestamp_end} ` +
-`-c:v libx264 -c:a aac ` +
-`-vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" ` +
-`"klip_${clip.id}_${name}.mp4"`;
-  navigator.clipboard.writeText(cmd)
-    .then(() => alert('✓ Command ffmpeg berhasil dicopy!'))
-    .catch(() => alert(cmd));
-}
-
-/* ============================================================
-   EXPORT ALL (download .txt)
-   ============================================================ */
-function exportAll() {
-  if (!currentClips.length) return;
-  const movie = currentMovieInfo;
-  let out = `=== CINECLIP AI EXPORT ===\nFilm: ${movie.title} (${movie.year})\n${'='.repeat(40)}\n\n`;
-
-  currentClips.forEach(clip => {
-    out += `--- KLIP ${clip.id}: ${clip.title} ---\n`;
-    out += `Timestamp : ${clip.timestamp_start} → ${clip.timestamp_end} (${clip.duration_seconds}s)\n`;
-    out += `Hype      : ${'★'.repeat(clip.hype_level || 3)}\n\n`;
-    out += `Deskripsi:\n${clip.scene_description}\n\n`;
-    out += `Hook:\n"${clip.hook}"\n\n`;
-    out += `VO Script:\n${clip.vo_script}\n\n`;
-    out += `Hashtag: ${(clip.hashtags || []).join(' ')}\n`;
-    out += `${'─'.repeat(40)}\n\n`;
   });
-
-  const blob = new Blob([out], { type: 'text/plain' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = `cineclip_${(movie.title || 'film').replace(/\s+/g, '_')}.txt`;
-  a.click();
 }
 
-/* ============================================================
-   PROGRESS HELPERS
-   ============================================================ */
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function setProgress(pct) {
-  document.getElementById('progressBar').style.width = pct + '%';
-}
-
+function setProgress(pct) { document.getElementById('progressBar').style.width = pct + '%'; }
 function resetSteps() {
   ['step1','step2','step3','step4','step5'].forEach((id, idx) => {
     const el = document.getElementById(id);
@@ -414,18 +244,15 @@ function resetSteps() {
   });
   setProgress(0);
 }
-
 async function activateStep(id, delay) {
   document.getElementById(id).classList.add('active');
   await sleep(delay);
 }
-
 async function completeStep(id) {
   const el = document.getElementById(id);
   el.classList.remove('active');
   el.classList.add('done');
   el.querySelector('.step-icon').textContent = '✓';
-  /* Also complete all previous steps */
   const ids = ['step1','step2','step3','step4','step5'];
   const idx  = ids.indexOf(id);
   for (let j = 0; j < idx; j++) {
@@ -437,22 +264,13 @@ async function completeStep(id) {
   }
 }
 
-/* ============================================================
-   ERROR HELPERS
-   ============================================================ */
 function showError(msg) {
   const el = document.getElementById('errorBox');
   el.textContent = '⚠ ' + msg;
   el.classList.add('active');
 }
+function hideError() { document.getElementById('errorBox').classList.remove('active'); }
 
-function hideError() {
-  document.getElementById('errorBox').classList.remove('active');
-}
-
-/* ============================================================
-   KEYBOARD SHORTCUT — Enter to analyze
-   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('movieInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') startAnalysis();
