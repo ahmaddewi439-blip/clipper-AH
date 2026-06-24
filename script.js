@@ -145,8 +145,8 @@ async function callClaudeAPI(prompt) {
       'X-Title'       : 'CineClip AI' 
     },
     body : JSON.stringify({
-      // Menggunakan model Gemini 1.5 Flash (Gratis via OpenRouter)
-      model      : 'google/gemini-2.5-flash:free', 
+      // Menggunakan model Gemini Gemini 3.5 Flash (Gratis via OpenRouter)
+      model      : 'google/gemini-2.5-flash-lite:free', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
