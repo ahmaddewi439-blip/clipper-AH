@@ -1,5 +1,5 @@
 /* ============================================================
-   CineClip AI — script.js (VERSI GPT-4o & ANTI ERROR COPY)
+   CineClip AI — script.js (VERSI 2 KOTAK INPUT + VO 1 MENIT PAS)
    ============================================================ */
 
 'use strict';
@@ -9,18 +9,18 @@ let currentMovieInfo = {};
 
 const LANG_LABELS = {
   Indonesia : 'Indonesia',
-  English   : 'English',
-  Melayu    : 'Melayu',
-  Jawa      : 'Jawa',
-  Sunda     : 'Sunda',
-  Japanese  : '日本語',
-  Korean    : '한국어',
-  Spanish   : 'Español',
+  English   : 'English'
 };
 
 async function startAnalysis() {
-  const input = document.getElementById('movieInput').value.trim();
-  if (!input) { showError('Masukkan judul atau detail film terlebih dahulu.'); return; }
+  // Mengambil data dari 2 kotak yang baru dibuat
+  const title = document.getElementById('movieTitle')?.value.trim();
+  const synopsis = document.getElementById('movieSynopsis')?.value.trim();
+  
+  if (!title || !synopsis) { 
+    showError('Mohon isi Judul Film dan Sinopsisnya terlebih dahulu.'); 
+    return; 
+  }
 
   const voLang       = document.getElementById('voLang').value;
   const voTone       = document.getElementById('voTone').value;
@@ -41,7 +41,7 @@ async function startAnalysis() {
     await activateStep('step3',  800); setProgress(58);
     await activateStep('step4',  600); setProgress(78);
 
-    const prompt = buildPrompt(input, voLang, voTone, clipCount, clipDuration);
+    const prompt = buildPrompt(title, synopsis, voLang, voTone, clipCount, clipDuration);
     const raw    = await callKoboiAPI(prompt);
 
     await completeStep('step4');
@@ -61,22 +61,26 @@ async function startAnalysis() {
 
   } catch (e) {
     document.getElementById('progressArea').classList.remove('active');
-    showError('Terjadi kesalahan: ' + e.message + ' (Pastikan API Key valid)');
+    showError('Terjadi kesalahan: ' + e.message);
     console.error(e);
   } finally {
     document.getElementById('analyzeBtn').disabled = false;
   }
 }
 
-function buildPrompt(input, lang, tone, count, duration) {
+function buildPrompt(title, synopsis, lang, tone, count, duration) {
+  // RUMUS RAHASIA: Rata-rata manusia bicara 130 kata per 60 detik (sekitar 2.1 - 2.2 kata per detik)
+  const targetWords = Math.floor(duration * 2.2);
+
   return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary".
 
-INFORMASI DARI USER: "${input}"
+JUDUL FILM: "${title}"
+SINOPSIS DARI USER: "${synopsis}"
 
-ATURAN KETAT:
-1. JANGAN MENGARANG CERITA. Kembangkan naskah HANYA berdasarkan petunjuk user.
-2. TIMESTAMP: Berikan angka urut saja (misal 00:00:00 -> 00:01:00) sebagai ESTIMASI.
-3. Buat ${count} klip berdurasi ${duration} detik.
+ATURAN KETAT (WAJIB PATUH):
+1. JANGAN MENGARANG CERITA FIKTIF! Kembangkan adegan HANYA dari detail SINOPSIS DARI USER di atas.
+2. PANJANG SCRIPT VO: User meminta durasi klip ${duration} detik. Oleh karena itu, panjang teks pada bagian "vo_script" HARUS PAS DAN MENDETAIL, sekitar ${targetWords} KATA! JANGAN buat naskah yang terlalu pendek. Jabarkan suasananya!
+3. Buat ${count} klip berdasarkan urutan cerita.
 
 Output HARUS format JSON (HANYA JSON):
 {
@@ -106,7 +110,7 @@ Output HARUS format JSON (HANYA JSON):
           "Opsi 3 hook"
         ]
       },
-      "vo_script": "Skrip VO bahasa Indonesia kasual dan asik.",
+      "vo_script": "Skrip VO bahasa Indonesia kasual. Wajib panjang sekitar ${targetWords} kata sesuai hitungan durasi.",
       "hashtags": ["#tag1", "#tag2"]
     }
   ]
@@ -114,11 +118,10 @@ Output HARUS format JSON (HANYA JSON):
 }
 
 async function callKoboiAPI(prompt) {
-  // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
-  const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw'; 
-  
-  
-  const BASE_URL = 'https://lite.koboillm.com';
+  // --- PASTIKAN API KEY KOBOI GPT-4o ANDA ADA DI SINI ---
+  const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';  
+  const BASE_URL = 'https://lite.koboillm.com'; 
+
   const response = await fetch(BASE_URL + '/v1/chat/completions', {
     method  : 'POST',
     headers : {
@@ -126,7 +129,7 @@ async function callKoboiAPI(prompt) {
       'Authorization' : 'Bearer ' + KOBOI_API_KEY
     },
     body : JSON.stringify({
-      model      : 'openai/gpt-4o', 
+      model      : 'gpt-4o', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
@@ -145,7 +148,6 @@ async function callKoboiAPI(prompt) {
 }
 
 function parseResponse(raw) {
-  // Cara aman menghapus backtick tanpa memicu error saat di copy-paste
   let clean = raw.replace(new RegExp('\`{3}json', 'g'), '').replace(new RegExp('\`{3}', 'g'), '').trim();
   try { return JSON.parse(clean); } 
   catch (_) {
@@ -207,7 +209,7 @@ function renderResults(data, lang, duration) {
         </div>
 
         <div class="vo-section" style="margin-top: 14px;">
-          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip Voice Over</h4>
+          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip Voice Over (Target: ~${Math.floor(duration * 2.2)} kata)</h4>
           <div class="vo-script-box" id="voBox${i}">
             <button class="vo-copy-btn" id="copyBtn${i}" onclick="copyVO(${i})">COPY</button>
             <div class="vo-text">${clip.vo_script || '-'}</div>
@@ -272,8 +274,12 @@ function showError(msg) {
 }
 function hideError() { document.getElementById('errorBox').classList.remove('active'); }
 
+// Update event listener untuk text area
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('movieInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') startAnalysis();
+  document.getElementById('movieTitle').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('movieSynopsis').focus();
+    }
   });
 });
