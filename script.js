@@ -145,8 +145,8 @@ async function callClaudeAPI(prompt) {
       'X-Title'       : 'CineClip AI' 
     },
     body : JSON.stringify({
-      // Menggunakan model llama-3.3-70b-instruct (Gratis via OpenRouter)
-      model      : 'meta-llama/llama-3.3-70b-instruct:free', 
+      // Menggunakan model openrouter auto Gratis via OpenRouter)
+      model      : 'openrouter/auto', 
       messages   : [{ role: 'user', content: prompt }]
     }),
   });
