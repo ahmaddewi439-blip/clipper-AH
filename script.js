@@ -57,7 +57,11 @@ async function startAnalysis() {
     await activateStep('step4',  600); setProgress(78);
 
     const prompt = buildPrompt(input, voLang, voTone, clipCount, clipDuration);
-    const raw    = await callClaudeAPI(prompt);
+    
+    // Memanggil API dengan sistem Auto-Fallback (Mendapatkan teks dan sumber API)
+    const apiResult = await callClaudeAPI(prompt);
+    const raw       = apiResult.raw;
+    const apiSource = apiResult.source;
 
     await completeStep('step4');
     await activateStep('step5', 500); setProgress(92);
@@ -69,7 +73,8 @@ async function startAnalysis() {
     currentClips     = parsed.clips;
     currentMovieInfo = parsed.movie;
 
-    renderResults(parsed, voLang, clipDuration);
+    // Mengirimkan apiSource untuk ditampilkan di UI
+    renderResults(parsed, voLang, clipDuration, apiSource);
 
     document.getElementById('progressArea').classList.remove('active');
     document.getElementById('resultsArea').classList.add('active');
@@ -84,7 +89,7 @@ async function startAnalysis() {
 }
 
 /* ============================================================
-   PROMPT BUILDER (Versi Teks Statis CapCut Top & Bottom)
+   PROMPT BUILDER
    ============================================================ */
 function buildPrompt(input, lang, tone, count, duration) {
   const toneDesc = TONE_DESC[tone] || 'dramatis';
@@ -142,43 +147,84 @@ Pastikan output HANYA JSON yang valid, tanpa teks awalan atau akhiran apa pun.`;
 }
 
 /* ============================================================
-   CLAUDE API CALL (API Asli Anda)
+   CLAUDE API CALL (AUTO-FALLBACK: KOBOI -> OPENROUTER)
    ============================================================ */
 async function callClaudeAPI(prompt) {
-  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g';
-  const KOBOI_BASE_URL = '[https://lite.koboillm.com](https://lite.koboillm.com)';
+  // --- KONFIGURASI API ---
+  const KOBOI_API_KEY  = 'sk-aYcADlIY9uLbhY78SFc44g'; 
+  const KOBOI_BASE_URL = 'https://lite.koboillm.com';
 
-  const response = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
-    method  : 'POST',
-    headers : {
-      'Content-Type'  : 'application/json',
-      'Authorization' : 'Bearer ' + KOBOI_API_KEY
-    },
-    body : JSON.stringify({
-      model      : 'gemini/gemini-2.5-flash-lite',
-      messages   : [{ role: 'user', content: prompt }]
-    }),
-  });
+  const OPENROUTER_API_KEY = 'API_KEY_OPENROUTER_ANDA_DISINI'; 
+  const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'HTTP ' + response.status);
+  let rawResponse = null;
+  let usedSource = '';
+
+  try {
+    // 1. MENCOBA JALUR UTAMA (KOBOI LLM)
+    const responseKoboi = await fetch(KOBOI_BASE_URL + '/v1/chat/completions', {
+      method  : 'POST',
+      headers : {
+        'Content-Type'  : 'application/json',
+        'Authorization' : 'Bearer ' + KOBOI_API_KEY
+      },
+      body : JSON.stringify({
+        model      : 'gemini/gemini-2.5-flash-lite',
+        messages   : [{ role: 'user', content: prompt }]
+      }),
+    });
+
+    if (!responseKoboi.ok) throw new Error("Koboi Down / Error");
+
+    const dataKoboi = await responseKoboi.json();
+    if (dataKoboi.choices && dataKoboi.choices.length > 0) {
+      rawResponse = dataKoboi.choices[0].message.content;
+      usedSource = 'KOBOI';
+    } else {
+      throw new Error('Respons format Koboi kosong');
+    }
+
+  } catch (errorKoboi) {
+    // 2. JIKA KOBOI GAGAL, PINDAH OTOMATIS KE CADANGAN (OPENROUTER)
+    console.warn("Koboi gagal merespon, beralih ke OpenRouter...");
+
+    const responseOR = await fetch(OPENROUTER_BASE_URL + '/chat/completions', {
+      method  : 'POST',
+      headers : {
+        'Content-Type'  : 'application/json',
+        'Authorization' : 'Bearer ' + OPENROUTER_API_KEY,
+        'HTTP-Referer'  : 'https://clipper-ah.vercel.app', 
+        'X-Title'       : 'CineClip AI' 
+      },
+      body : JSON.stringify({
+        model      : 'google/gemini-1.5-flash',
+        messages   : [{ role: 'user', content: prompt }]
+      }),
+    });
+
+    if (!responseOR.ok) {
+      const err = await responseOR.json().catch(() => ({}));
+      throw new Error('KEDUA API MATI. OpenRouter error: ' + (err.error?.message || responseOR.status));
+    }
+
+    const dataOR = await responseOR.json();
+    if (dataOR.choices && dataOR.choices.length > 0) {
+      rawResponse = dataOR.choices[0].message.content;
+      usedSource = 'OPENROUTER';
+    } else {
+      throw new Error('Respons format OpenRouter kosong.');
+    }
   }
 
-  const data = await response.json();
-  
-  if (data.choices && data.choices.length > 0) {
-    return data.choices[0].message.content;
-  } else {
-    throw new Error('Respons dari AI kosong atau format tidak sesuai.');
-  }
+  return { raw: rawResponse, source: usedSource };
 }
 
 /* ============================================================
    PARSE RESPONSE
    ============================================================ */
 function parseResponse(raw) {
-  const clean = raw.replace(/```json|```/g, '').trim();
+  const clean = raw.replace(/```json|
+```/g, '').trim();
   try {
     return JSON.parse(clean);
   } catch (_) {
@@ -191,14 +237,23 @@ function parseResponse(raw) {
 /* ============================================================
    RENDER RESULTS
    ============================================================ */
-function renderResults(data, lang, duration) {
+function renderResults(data, lang, duration, apiSource) {
   const { movie, clips } = data;
+
+  // Membuat Desain Notifikasi API di UI
+  let sourceBadge = '';
+  if (apiSource === 'KOBOI') {
+    sourceBadge = `<div style="background: rgba(46, 204, 113, 0.15); color: #2ecc71; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; border: 1px solid #2ecc71; display: inline-block;">✅ API AKTIF: KOBOI LLM</div>`;
+  } else if (apiSource === 'OPENROUTER') {
+    sourceBadge = `<div style="background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; border: 1px solid #e74c3c; display: inline-block;">⚠️ KOBOI DOWN — MENGGUNAKAN OPENROUTER</div>`;
+  }
 
   const metaEl = document.getElementById('movieMeta');
   metaEl.innerHTML = `
     <div class="movie-poster">🎬</div>
     <div class="movie-info">
-      <h2>${movie.title} (${movie.year || ''})</h2>
+      ${sourceBadge}
+      <h2 style="margin-top:0;">${movie.title} (${movie.year || ''})</h2>
       <p>${movie.description || ''}</p>
       <div class="movie-tags">
         ${(movie.genre || []).map(g => `<span class="tag">${g}</span>`).join('')}
@@ -213,7 +268,6 @@ function renderResults(data, lang, duration) {
   grid.innerHTML = clips.map((clip, i) => {
     const flames = '🔥'.repeat(Math.min(clip.hype_level || 3, 5));
     
-    // Menangkap data teks statis capcut dari AI
     const ts = clip.teks_statis_capcut || { judul_atas: clip.title, opsi_hook_bawah: ["Hook 1", "Hook 2", "Hook 3"] };
 
     return `
@@ -256,7 +310,6 @@ function renderResults(data, lang, duration) {
           <div class="scene-desc">${clip.scene_description || '-'}</div>
         </div>
 
-        <!-- BLOK BARU UNTUK TEKS CAPCUT (FULL DURASI) -->
         <div class="info-block" style="margin-top:14px; background: rgba(255, 69, 0, 0.08); border-left: 3px solid var(--primary); padding: 14px;">
           <h4 style="color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
             📱 Teks Statis CapCut (Tampil Awal s/d Akhir)
