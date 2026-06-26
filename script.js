@@ -68,17 +68,26 @@ async function startAnalysis() {
 }
 
 function buildPrompt(title, synopsis, lang, tone, count, duration) {
-  const targetWords = Math.floor(duration * 2.2);
-
-  return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary".
+  // === RUMUS PRESISI DURASI KE JUMLAH KATA (Standar 130 Kata/Menit) ===
+  // Menggunakan 2.16 kata/detik agar pas dengan standar kecepatan bicara.
+  const targetWords = Math.floor(duration * 2.16);
+  
+  return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary" dan Sutradara Video Profesional.
 
 JUDUL FILM: "${title}"
 SINOPSIS DARI USER: "${synopsis}"
 
-ATURAN KETAT (WAJIB PATUH):
-1. JUMLAH KLIP: Kamu WAJIB menghasilkan TEPAT ${count} klip dalam array "clips". JANGAN KURANG! Pecah alur cerita sinopsis di atas menjadi ${count} bagian (misal: pengenalan, konflik 1, konflik 2, misteri, klimaks, dll).
-2. IZIN IMPROVISASI: Karena sinopsisnya singkat, kamu DIIZINKAN berimprovisasi membayangkan adegan visual, menambah detail suasana tegang, dan memperkaya narasi agar durasi terpenuhi. Syaratnya: Inti cerita harus tetap sesuai dengan sinopsis!
-3. PANJANG SCRIPT VO: Untuk memenuhi durasi ${duration} detik, naskah "vo_script" HARUS sangat detail dan panjang, sekitar ${targetWords} KATA per klip!
+ATURAN KETAT PEMILIHAN ADEGAN (VISUAL LOCK - WAJIB PATUH):
+1. ANTI-AWALAN MEMBOSANKAN: JANGAN PERNAH mengambil adegan pengenalan di awal film (menit 0-5) jika itu hanya dialog atau pemandangan.
+2. KUNCI ADEGAN PUNCAK: Langsung lompat dan cari adegan dengan tingkat emosi tertinggi (adegan menegangkan, komedi brutal, horor/jump scare, atau plot twist gila).
+3. TEPAT ${count} KLIP: Pecah adegan puncak tersebut menjadi TEPAT ${count} klip dalam array "clips". JANGAN KURANG!
+4. TIMESTAMP AKURAT: Berikan perkiraan rentang waktu (timestamp) yang langsung menunjuk ke momen puncak tersebut, BUKAN dari menit awal film.
+
+ATURAN KETAT SCRIPT VOICE OVER & DURASI (PRESISI 100%):
+1. Setiap klip ditetapkan berdurasi TEPAT ${duration} detik.
+2. BERDASARKAN DURASI TERSEBUT, Script Voice Over (Tone: ${tone}) dalam bahasa ${lang} HARUS terdiri dari TEPAT ${targetWords} KATA! 
+3. JANGAN KURANG, JANGAN LEBIH! Jika script kurang dari ${targetWords} kata, video akan memiliki ruang sunyi di akhir. Jika lebih, audio akan terpotong sebelum video selesai. Hitung jumlah kata Anda dengan sangat teliti!
+4. HOOK AWALAN: Kata pertama di naskah "vo_script" WAJIB berupa kalimat "Hook" yang langsung mengomentari adegan visual ekstrem tersebut agar penonton tidak melakukan swipe (Contoh: "Kalian nggak akan percaya adegan gila ini...").
 
 Output HARUS format JSON (HANYA JSON):
 {
@@ -94,12 +103,12 @@ Output HARUS format JSON (HANYA JSON):
     {
       "id": 1,
       "title": "Judul adegan",
-      "scene_description": "Deskripsi visual adegan",
-      "timestamp_start": "00:01:00",
-      "timestamp_end": "00:02:00",
+      "scene_description": "Deskripsi visual adegan puncak secara detail agar editor mudah memotongnya",
+      "timestamp_start": "00:25:00",
+      "timestamp_end": "00:26:00",
       "duration_seconds": ${duration},
       "hype_level": 5,
-      "reason": "Alasan adegan ini menarik",
+      "reason": "Alasan kenapa adegan ini sangat menegangkan/konyol",
       "teks_statis_capcut": {
         "judul_atas": "JUDUL ATAS (Maks 4 kata kapital)",
         "opsi_hook_bawah": [
@@ -108,13 +117,12 @@ Output HARUS format JSON (HANYA JSON):
           "Opsi 3 hook"
         ]
       },
-      "vo_script": "Skrip VO bahasa Indonesia kasual. Wajib panjang sekitar ${targetWords} kata.",
+      "vo_script": "Skrip VO dengan awalan Hook. Wajib dihitung dan dipastikan panjangnya TEPAT sekitar ${targetWords} kata. Tidak boleh kurang atau lebih.",
       "hashtags": ["#tag1", "#tag2"]
     }
   ]
 }`;
 }
-
 async function callKoboiAPI(prompt) {
   // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
   const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';   
