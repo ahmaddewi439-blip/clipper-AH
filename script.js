@@ -247,10 +247,13 @@ function renderResults(data, lang, duration) {
         <div class="chevron">▼</div>
       </div>
       <div class="clip-body">
-        <div class="info-block" style="margin-top:12px">
-          <h4>🎥 Petunjuk Cari Adegan di LK21:</h4>
-          <div class="scene-desc" style="font-weight:bold; color:var(--accent2);">${clip.scene_description || '-'}</div>
-        </div>
+       <div class="info-block" style="margin-top:12px">
+  <h4>🎥 Petunjuk Cari Adegan di LK21:</h4>
+  <div style="font-weight:bold; color: #ffeb3b; background: rgba(255, 235, 59, 0.15); padding: 8px; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ffeb3b;">
+    ⏳ WAKTU: ${clip.timestamp_adegan || 'Tidak ada data waktu'}
+  </div>
+  <div class="scene-desc" style="font-weight:bold; color:var(--accent2);">${clip.scene_description || '-'}</div>
+</div>
         
         <div class="info-block" style="margin-top:14px; background: rgba(255, 69, 0, 0.08); border-left: 3px solid var(--primary); padding: 14px;">
           <h4 style="color: var(--primary); margin-bottom: 10px;">📱 Teks Statis CapCut</h4>
