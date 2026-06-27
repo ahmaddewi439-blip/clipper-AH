@@ -1,125 +1,23 @@
 /* ============================================================
-   CineClip AI — script.js (VERSI FIX: TWO-STEP GENERATION)
+   CineClip AI — script.js (VERSI FIX MULTI-CLIP & IMPROVISASI)
    ============================================================ */
 
 'use strict';
 
 let currentClips    = [];
 let currentMovieInfo = {};
-let recommendedScenes = []; // Menyimpan data rekomendasi sementara
 
 const LANG_LABELS = {
   Indonesia : 'Indonesia',
   English   : 'English'
 };
 
-// ==========================================
-// TAHAP 1: PENCARIAN REKOMENDASI ADEGAN
-// ==========================================
-async function findScenes() {
+async function startAnalysis() {
   const title = document.getElementById('movieTitle')?.value.trim();
   const synopsis = document.getElementById('movieSynopsis')?.value.trim();
   
   if (!title || !synopsis) { 
-    showError('Mohon isi Judul Film dan Sinopsis Utuh terlebih dahulu untuk mencari adegan.'); 
-    return; 
-  }
-
-  const btn = document.getElementById('findScenesBtn');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Sedang Membaca Sinopsis...';
-  btn.disabled = true;
-  hideError();
-
-  try {
-    const prompt = buildRecommendPrompt(title, synopsis);
-    const raw = await callKoboiAPI(prompt);
-    const parsed = parseResponse(raw);
-    
-    if (parsed.rekomendasi_adegan && parsed.rekomendasi_adegan.length > 0) {
-      renderSceneCards(parsed.rekomendasi_adegan);
-    } else {
-      showError('Gagal menemukan rekomendasi adegan. Coba ubah sinopsis Anda.');
-    }
-  } catch (e) {
-    showError('Terjadi kesalahan saat mencari adegan: ' + e.message);
-    console.error(e);
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
-}
-
-function buildRecommendPrompt(title, fullSynopsis) {
-  return `Anda adalah Asisten Analis Film.
-JUDUL FILM: "${title}"
-SINOPSIS UTUH: "${fullSynopsis}"
-
-TUGAS:
-Ekstrak 3 hingga 4 adegan paling epik, dramatis, atau penuh aksi dari sinopsis di atas yang sangat cocok dipotong menjadi konten video vertikal yang viral.
-Jelaskan kejadiannya secara singkat dan padat (fokus pada Siapa, Ngapain, Di mana/Bagaimana).
-
-Output wajib HANYA dalam format JSON:
-{
-  "rekomendasi_adegan": [
-    {
-      "judul_card": "Judul Singkat (Contoh: Pertarungan Akhir)",
-      "deskripsi_adegan": "Deskripsi kejadian (Contoh: Karakter utama membalas dendam di atas gedung pencakar langit saat hujan deras.)"
-    }
-  ]
-}`;
-}
-
-function renderSceneCards(scenes) {
-  recommendedScenes = scenes;
-  const container = document.getElementById('cardsContainer');
-  const area = document.getElementById('recommendationArea');
-  
-  container.innerHTML = scenes.map((scene, i) => `
-    <div class="scene-card" id="sceneCard_${i}" onclick="selectScene(${i})" style="padding: 12px; background: rgba(0,0,0,0.5); border: 2px solid #444; border-radius: 8px; cursor: pointer; transition: 0.2s;">
-      <h4 style="margin: 0 0 5px 0; color: #fff;">🎬 ${scene.judul_card}</h4>
-      <p style="margin: 0; font-size: 0.9rem; color: #aaa;">${scene.deskripsi_adegan}</p>
-    </div>
-  `).join('');
-  
-  area.style.display = 'block';
-}
-
-function selectScene(index) {
-  const scene = recommendedScenes[index];
-  
-  // Masukkan teks ke dalam textarea
-  const textarea = document.getElementById('movieSynopsis');
-  textarea.value = scene.deskripsi_adegan;
-  
-  // Efek visual klik (Highlight card yang dipilih)
-  document.querySelectorAll('.scene-card').forEach((el, i) => {
-    if (i === index) {
-      el.style.border = '2px solid #2ecc71';
-      el.style.background = 'rgba(46, 204, 113, 0.1)';
-    } else {
-      el.style.border = '2px solid #444';
-      el.style.background = 'rgba(0,0,0,0.5)';
-    }
-  });
-
-  // Highlight tombol Generate utama agar user tahu langkah selanjutnya
-  document.getElementById('analyzeBtn').style.boxShadow = '0 0 15px var(--accent)';
-  setTimeout(() => {
-    document.getElementById('analyzeBtn').style.boxShadow = 'none';
-  }, 1500);
-}
-
-
-// ==========================================
-// TAHAP 2: EKSEKUSI PEMBUATAN SKRIP VO
-// ==========================================
-async function startAnalysis() {
-  const title = document.getElementById('movieTitle')?.value.trim();
-  const sceneContext = document.getElementById('movieSynopsis')?.value.trim();
-  
-  if (!title || !sceneContext) { 
-    showError('Mohon isi Judul Film dan pilih/isi Konteks Adegan terlebih dahulu.'); 
+    showError('Mohon isi Judul Film dan Sinopsisnya terlebih dahulu.'); 
     return; 
   }
 
@@ -142,7 +40,7 @@ async function startAnalysis() {
     await activateStep('step3',  800); setProgress(58);
     await activateStep('step4',  600); setProgress(78);
 
-    const prompt = buildPrompt(title, sceneContext, voLang, voTone, clipCount, clipDuration);
+    const prompt = buildPrompt(title, synopsis, voLang, voTone, clipCount, clipDuration);
     const raw    = await callKoboiAPI(prompt);
 
     await completeStep('step4');
@@ -169,57 +67,46 @@ async function startAnalysis() {
   }
 }
 
-function buildPrompt(title, sceneContext, lang, tone, count, duration) {
-  // RUMUS SANGAT KETAT UNTUK DURASI & KATA
+function buildPrompt(title, synopsis, lang, tone, count, duration) {
   const durasiPerKlip = Math.floor(duration / count); 
   const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.5); 
   
-  return `Anda adalah 'CineClip AI', spesialis narasi video vertikal.
+  return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
 
 JUDUL FILM: "${title}"
-KONTEKS ADEGAN REKAMAN: "${sceneContext}"
+SINOPSIS: "${synopsis}"
 
-SITUASI & TUGAS UTAMA: 
-User baru saja merekam (screen-record) potongan adegan dari film berdasarkan konteks di atas.
-Tugas Anda HANYA membuat naskah Voice Over (VO) yang FOKUS 100% mendeskripsikan kejadian pada "KONTEKS ADEGAN REKAMAN". 
-JANGAN mengarang cerita lain atau membahas bagian awal/akhir film jika tidak ada di konteks.
+TUGAS UTAMA: 
+Ekstrak TEPAT ${count} adegan PALING SERU (menegangkan, komedi brutal, plot twist, dll) dari sinopsis tersebut.
 
-ATURAN KETAT DURASI & KATA (HARGA MATI):
-1. Video ini dibagi persis menjadi ${count} klip.
-2. Durasi SETIAP KLIP adalah TEPAT ${durasiPerKlip} detik.
-3. Skrip VO bahasa ${lang} (Tone: ${tone}) untuk SETIAP KLIP dibatasi MAKSIMAL ${targetWordsPerKlip} KATA. JANGAN LEBIH!
+ATURAN KETAT (HARGA MATI):
+1. JANGAN BUAT TIMESTAMP/WAKTU. Sebagai gantinya, buat "scene_description" yang sangat mendetail tentang kejadian visualnya agar user gampang mencari adegan ini secara manual di film.
+2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP dibatasi MAKSIMAL ${targetWordsPerKlip} KATA. JANGAN LEBIH!
+3. Anda WAJIB membuat tepat ${count} klip di dalam array JSON.
 
 Output HARUS format JSON (HANYA JSON):
 {
   "movie": {
     "title": "${title}",
-    "description": "Fokus Adegan: ${sceneContext}",
-    "total_duration": "${duration} detik"
+    "description": "Analisis adegan puncak selesai."
   },
   "clips": [
     {
       "id": 1,
-      "title": "Judul spesifik adegan ini",
-      "scene_description": "Deskripsi visual berdasarkan konteks adegan",
-      "timestamp_start": "00:00:00",
-      "timestamp_end": "00:00:${durasiPerKlip < 10 ? '0'+durasiPerKlip : durasiPerKlip}",
-      "duration_seconds": ${durasiPerKlip},
+      "title": "Judul Adegan",
+      "scene_description": "Petunjuk visual detail: Cari adegan saat karakter X melakukan Y di tempat Z...",
       "hype_level": 5,
-      "reason": "Alasan skrip ini pas dengan durasi",
       "teks_statis_capcut": {
         "judul_atas": "JUDUL ATAS",
         "opsi_hook_bawah": ["Hook 1", "Hook 2", "Hook 3"]
       },
-      "vo_script": "Tulis narasi di sini. WAJIB MAKSIMAL ${targetWordsPerKlip} KATA. Langsung to the point."
+      "vo_script": "Teks narasi di sini. WAJIB MAKSIMAL ${targetWordsPerKlip} KATA."
     }
   ]
 }`;
 }
-
-// ==========================================
-// KONEKSI API & UTILITAS UMUM
-// ==========================================
 async function callKoboiAPI(prompt) {
+  // --- MASUKKAN KODE API KOBOI ANDA DI BAWAH INI ---
   const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';   
   const BASE_URL = 'https://lite.koboillm.com'; 
 
