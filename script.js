@@ -158,6 +158,8 @@ function renderResults(data, lang, duration) {
   `;
 
   const grid = document.getElementById('clipsGrid');
+  const durasiPerKlip = Math.floor(duration / clips.length); // Hitung ulang durasi per klip
+  
   grid.innerHTML = clips.map((clip, i) => {
     const flames = '🔥'.repeat(Math.min(clip.hype_level || 3, 5));
     const ts = clip.teks_statis_capcut || { judul_atas: clip.title, opsi_hook_bawah: ["Hook 1", "Hook 2", "Hook 3"] };
@@ -170,15 +172,15 @@ function renderResults(data, lang, duration) {
           <div class="clip-title">${clip.title}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <div class="clip-duration-badge">${clip.timestamp_start} → ${clip.timestamp_end}</div>
+          <div class="clip-duration-badge">Target Durasi: ${durasiPerKlip} Detik</div>
           <div class="clip-hype">${flames}</div>
         </div>
         <div class="chevron">▼</div>
       </div>
       <div class="clip-body">
         <div class="info-block" style="margin-top:12px">
-          <h4>Deskripsi Adegan</h4>
-          <div class="scene-desc">${clip.scene_description || '-'}</div>
+          <h4>🎥 Petunjuk Cari Adegan di LK21:</h4>
+          <div class="scene-desc" style="font-weight:bold; color:var(--accent2);">${clip.scene_description || '-'}</div>
         </div>
         
         <div class="info-block" style="margin-top:14px; background: rgba(255, 69, 0, 0.08); border-left: 3px solid var(--primary); padding: 14px;">
@@ -197,7 +199,7 @@ function renderResults(data, lang, duration) {
         </div>
 
         <div class="vo-section" style="margin-top: 14px;">
-          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip Voice Over (Maksimal: ~${Math.floor((duration / clips.length) * 2.5)} kata)</h4>
+          <h4 class="section-label" style="margin:0 0 8px">🎙 Skrip VO (Pas untuk ~${durasiPerKlip} Detik)</h4>
           <div class="vo-script-box" id="voBox${i}">
             <button class="vo-copy-btn" id="copyBtn${i}" onclick="copyVO(${i})">COPY</button>
             <div class="vo-text">${clip.vo_script || '-'}</div>
