@@ -136,21 +136,26 @@ Output HARUS format JSON (HANYA JSON):
 }`;
 }
 
-function buildPrompt(title, synopsis, lang, tone, count, duration) {
-  const durasiPerKlip = Math.floor(duration / count); 
-  const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.5); 
-  
+function buildPrompt(title, synopsis, lang, tone, count, duration, subtitleData) {
+  const durasiPerKlip = Math.floor(duration / count);
+  const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.5);
+
   return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
 
 JUDUL FILM: "${title}"
 SINOPSIS: "${synopsis}"
 
-TUGAS UTAMA: 
-Ekstrak TEPAT ${count} adegan PALING SERU (menegangkan, komedi brutal, plot twist, dll) dari sinopsis tersebut.
+DATA SUBTITLE ASLI (GUNAKAN INI UNTUK TIMESTAMP):
+---
+${subtitleData || 'TIDAK ADA DATA SUBTITLE'}
+---
+
+TUGAS UTAMA:
+Ekstrak TEPAT ${count} adegan PALING SERU dari sinopsis dan sesuaikan dengan dialog di data subtitle.
 
 ATURAN KETAT (HARGA MATI):
-1. JANGAN BUAT TIMESTAMP/WAKTU. Sebagai gantinya, buat "scene_description" yang sangat mendetail tentang kejadian visualnya agar user gampang mencari adegan ini secara manual di film.
-2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP dibatasi MAKSIMAL ${targetWordsPerKlip} KATA. JANGAN LEBIH!
+1. WAJIB BERIKAN "timestamp_adegan" (contoh: 01:15:30 -> 01:15:40) yang akurat berdasarkan dialog di data subtitle.
+2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP HARUS berisi MINIMAL ${Math.max(10, targetWordsPerKlip - 5)} kata dan MAKSIMAL ${targetWordsPerKlip + 5} kata. Ini batas mutlak agar teks VO tidak terlalu pendek.
 3. Anda WAJIB membuat tepat ${count} klip di dalam array JSON.
 
 Output HARUS format JSON (HANYA JSON):
@@ -163,13 +168,14 @@ Output HARUS format JSON (HANYA JSON):
     {
       "id": 1,
       "title": "Judul Adegan",
-      "scene_description": "Petunjuk visual detail: Cari adegan saat karakter X melakukan Y di tempat Z...",
+      "timestamp_adegan": "00:00:00 -> 00:00:00",
+      "scene_description": "Petunjuk visual detail adegan tersebut",
       "hype_level": 5,
       "teks_statis_capcut": {
         "judul_atas": "JUDUL ATAS",
         "opsi_hook_bawah": ["Hook 1", "Hook 2", "Hook 3"]
       },
-      "vo_script": "Teks narasi di sini. WAJIB MAKSIMAL ${targetWordsPerKlip} KATA."
+      "vo_script": "Teks narasi di sini. Tulis narasi yang padat, minimal ${Math.max(10, targetWordsPerKlip - 5)} kata."
     }
   ]
 }`;
