@@ -139,43 +139,47 @@ Output HARUS format JSON (HANYA JSON):
 function buildPrompt(title, synopsis, lang, tone, count, duration, subtitleData) {
   const durasiPerKlip = Math.floor(duration / count);
   const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.5);
+  // Toleransi sangat ketat: Maksimal meleset 2 kata
+  const minWords = targetWordsPerKlip - 2;
+  const maxWords = targetWordsPerKlip + 2;
 
   return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
 
 JUDUL FILM: "${title}"
 SINOPSIS: "${synopsis}"
 
-DATA SUBTITLE ASLI (GUNAKAN INI UNTUK TIMESTAMP):
+DATA SUBTITLE 1 FILM PENUH:
 ---
 ${subtitleData || 'TIDAK ADA DATA SUBTITLE'}
 ---
 
 TUGAS UTAMA:
-Ekstrak TEPAT ${count} adegan PALING SERU dari sinopsis dan sesuaikan dengan dialog di data subtitle.
+Pilih TEPAT ${count} adegan PALING "TER-" (paling mendebarkan, paling lucu, paling sedih, plot twist, atau horor) dari subtitle di atas. 
+PENTING: Adegan harus TERSEBAR MERATA dari babak AWAL, TENGAH (konflik), hingga AKHIR (klimaks) film. JANGAN hanya menumpuk di 20 menit pertama!
 
 ATURAN KETAT (HARGA MATI):
-1. WAJIB BERIKAN "timestamp_adegan" (contoh: 01:15:30 -> 01:15:40) yang akurat berdasarkan dialog di data subtitle.
-2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP HARUS berisi MINIMAL ${Math.max(10, targetWordsPerKlip - 5)} kata dan MAKSIMAL ${targetWordsPerKlip + 5} kata. Ini batas mutlak agar teks VO tidak terlalu pendek.
+1. WAJIB BERIKAN "timestamp_adegan" (contoh: 01:15:30 -> 01:15:40) yang BENAR-BENAR ADA di data subtitle.
+2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP WAJIB berisi antara ${minWords} sampai ${maxWords} kata. TIDAK BOLEH KURANG, TIDAK BOLEH LEBIH! Ini agar sesuai dengan durasi klip ${durasiPerKlip} detik.
 3. Anda WAJIB membuat tepat ${count} klip di dalam array JSON.
 
 Output HARUS format JSON (HANYA JSON):
 {
   "movie": {
     "title": "${title}",
-    "description": "Analisis adegan puncak selesai."
+    "description": "Analisis adegan puncak tersebar selesai."
   },
   "clips": [
     {
       "id": 1,
       "title": "Judul Adegan",
       "timestamp_adegan": "00:00:00 -> 00:00:00",
-      "scene_description": "Petunjuk visual detail adegan tersebut",
+      "scene_description": "Deskripsi visual adegan puncak ini",
       "hype_level": 5,
       "teks_statis_capcut": {
         "judul_atas": "JUDUL ATAS",
         "opsi_hook_bawah": ["Hook 1", "Hook 2", "Hook 3"]
       },
-      "vo_script": "Teks narasi di sini. Tulis narasi yang padat, minimal ${Math.max(10, targetWordsPerKlip - 5)} kata."
+      "vo_script": "Teks narasi di sini. WAJIB berjumlah antara ${minWords} hingga ${maxWords} kata. Hitung dengan teliti!"
     }
   ]
 }`;
