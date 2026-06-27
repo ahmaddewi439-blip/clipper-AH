@@ -50,11 +50,19 @@ export default async function handler(req, res) {
     const srtRes = await fetch(dlData.link);
     const srtText = await srtRes.text();
 
-    // Potong teks agar tidak terlalu panjang untuk AI (maks 15.000 karakter)
-    const limitedText = srtText.substring(0, 15000);
+    // BERSIIHKAN SUBTITLE AGAR 1 FILM FULL BISA MASUK AI
+    // Hapus angka urutan, tag HTML, dan baris kosong
+    const cleanSrt = srtText
+      .replace(/^[0-9]+$/gm, '') 
+      .replace(/<[^>]*>/g, '') 
+      .replace(/^\s*[\r\n]/gm, '') 
+      .trim();
 
-    // Kirim kembali teks subtitle ke frontend (script.js)
-    res.status(200).json({ subtitleData: limitedText });
+    // Batas aman Vercel (sekitar 80.000 karakter, cukup untuk 1 film durasi 3 jam)
+    const finalSrt = cleanSrt.substring(0, 80000);
+
+    // Kirim kembali teks subtitle ke frontend
+    res.status(200).json({ subtitleData: finalSrt });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
