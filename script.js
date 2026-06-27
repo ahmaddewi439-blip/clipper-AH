@@ -77,7 +77,7 @@ async function startAnalysis() {
     currentMovieInfo = parsed.movie;
 
     renderResults(parsed, voLang, clipDuration);
-
+    saveResultsToStorage(parsed, clipDuration);
     document.getElementById('progressArea').classList.remove('active');
     document.getElementById('resultsArea').classList.add('active');
 
@@ -351,6 +351,72 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       document.getElementById('movieSynopsis').focus();
+    }
+  });
+});
+
+// ==========================================
+// FITUR MEMORI (LOCAL STORAGE)
+// ==========================================
+
+// 1. Simpan input teks setiap kali diketik
+function saveInputsToStorage() {
+  const inputs = {
+    title: document.getElementById('movieTitle')?.value || '',
+    synopsis: document.getElementById('movieSynopsis')?.value || '',
+    lang: document.getElementById('voLang')?.value || 'Indonesia',
+    tone: document.getElementById('voTone')?.value || 'Dramatis',
+    count: document.getElementById('clipCount')?.value || '7',
+    duration: document.getElementById('clipDuration')?.value || '60'
+  };
+  localStorage.setItem('clipperInputs', JSON.stringify(inputs));
+}
+
+// 2. Simpan hasil akhir (klip & skrip VO) ke memori
+function saveResultsToStorage(parsedData, duration) {
+  const results = { data: parsedData, duration: duration };
+  localStorage.setItem('clipperResults', JSON.stringify(results));
+}
+
+// 3. Panggil ulang semua data saat web dibuka kembali
+function loadStateFromStorage() {
+  // Panggil Input
+  const savedInputs = localStorage.getItem('clipperInputs');
+  if (savedInputs) {
+    const inputs = JSON.parse(savedInputs);
+    if (document.getElementById('movieTitle')) document.getElementById('movieTitle').value = inputs.title;
+    if (document.getElementById('movieSynopsis')) document.getElementById('movieSynopsis').value = inputs.synopsis;
+    if (document.getElementById('voLang')) document.getElementById('voLang').value = inputs.lang;
+    if (document.getElementById('voTone')) document.getElementById('voTone').value = inputs.tone;
+    if (document.getElementById('clipCount')) document.getElementById('clipCount').value = inputs.count;
+    if (document.getElementById('clipDuration')) document.getElementById('clipDuration').value = inputs.duration;
+  }
+
+  // Panggil Hasil Analisis AI
+  const savedResults = localStorage.getItem('clipperResults');
+  if (savedResults) {
+    const results = JSON.parse(savedResults);
+    currentClips = results.data.clips;
+    currentMovieInfo = results.data.movie;
+    
+    // Tampilkan ulang ke layar
+    renderResults(results.data, document.getElementById('voLang')?.value || 'Indonesia', results.duration);
+    document.getElementById('progressArea').classList.remove('active');
+    document.getElementById('resultsArea').classList.add('active');
+  }
+}
+
+// 4. Pasang pendeteksi otomatis di setiap kolom input
+document.addEventListener('DOMContentLoaded', () => {
+  loadStateFromStorage(); // Jalankan saat web pertama kali dimuat
+
+  // Simpan tiap ada perubahan
+  const inputsToTrack = ['movieTitle', 'movieSynopsis', 'voLang', 'voTone', 'clipCount', 'clipDuration'];
+  inputsToTrack.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', saveInputsToStorage);
+      el.addEventListener('change', saveInputsToStorage);
     }
   });
 });
