@@ -72,13 +72,13 @@ function buildPrompt(title, synopsis, lang, tone, count, duration) {
   const durasiPerKlip = Math.floor(duration / count); 
   const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.16); 
   
-  return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
+  return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional yang dapat menganalisa Film secara Profesional yang sangat tepat sesuai adegan di film.
 
 JUDUL FILM: "${title}"
 SINOPSIS DARI USER: "${synopsis}"
 
 TUGAS UTAMA: 
-Pecah cerita di atas menjadi TEPAT ${count} adegan/klip. Total durasi video adalah ${duration} detik.
+Pecah cerita di atas menjadi TEPAT ${count} adegan/klip. Total durasi video adalah ${duration} detik dan menganalisa Film secara Profesional untuk menghasilkan voice over yang sesuai dengan adegan di moview.
 
 ATURAN KETAT PEMILIHAN ADEGAN (VISUAL LOCK):
 1. ANTI-AWALAN MEMBOSANKAN: JANGAN ambil adegan pengenalan di awal film (menit 0-5).
