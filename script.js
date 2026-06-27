@@ -419,4 +419,18 @@ document.addEventListener('DOMContentLoaded', () => {
       el.addEventListener('change', saveInputsToStorage);
     }
   });
+   // Tambahkan fungsi pemicu ini ke web Anda
+async function kirimKeBot(url, start, end) {
+    const BOT_TOKEN = '8145260196:AAHwA4zJZ57zNn7kC5yYpX2-d-cZ-22hHkE';
+    const MY_ID = '8196598586';
+    const pesan = `/potong ${url} ${start} -> ${end}`;
+    
+    // Web mengirim perintah langsung ke API Telegram
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: MY_ID, text: pesan })
+    });
+    alert("Perintah sudah dikirim ke Bot di PC Anda!");
+}
 });
