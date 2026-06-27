@@ -12,6 +12,24 @@ const LANG_LABELS = {
   English   : 'English'
 };
 
+// Tambahkan fungsi baru ini untuk memanggil backend Vercel Anda
+async function fetchSubtitleFromVercel(title) {
+  const response = await fetch('/api/subtitle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: title })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Gagal menarik data subtitle.');
+  }
+
+  const data = await response.json();
+  return data.subtitleData;
+}
+
+// PERBARUI FUNGSI startAnalysis
 async function startAnalysis() {
   const title = document.getElementById('movieTitle')?.value.trim();
   const synopsis = document.getElementById('movieSynopsis')?.value.trim();
@@ -35,12 +53,17 @@ async function startAnalysis() {
   setProgress(5);
 
   try {
-    await activateStep('step1', 1200); setProgress(20);
-    await activateStep('step2', 1000); setProgress(40);
+    await activateStep('step1', 800); setProgress(15);
+    
+    // TAHAP BARU: Menarik Subtitle
+    const subtitleText = await fetchSubtitleFromVercel(title);
+    
+    await activateStep('step2', 800); setProgress(40);
     await activateStep('step3',  800); setProgress(58);
     await activateStep('step4',  600); setProgress(78);
 
-    const prompt = buildPrompt(title, synopsis, voLang, voTone, clipCount, clipDuration);
+    // Masukkan teks subtitle ke dalam prompt
+    const prompt = buildPrompt(title, synopsis, voLang, voTone, clipCount, clipDuration, subtitleText);
     const raw    = await callKoboiAPI(prompt);
 
     await completeStep('step4');
@@ -65,6 +88,52 @@ async function startAnalysis() {
   } finally {
     document.getElementById('analyzeBtn').disabled = false;
   }
+}
+
+// PERBARUI FUNGSI buildPrompt
+function buildPrompt(title, synopsis, lang, tone, count, duration, subtitleData) {
+  const durasiPerKlip = Math.floor(duration / count); 
+  const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.5); 
+  
+  return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
+
+JUDUL FILM: "${title}"
+SINOPSIS: "${synopsis}"
+
+DATA SUBTITLE ASLI (GUNAKAN INI UNTUK TIMESTAMP YANG AKURAT):
+---
+${subtitleData}
+---
+
+TUGAS UTAMA: 
+Analisis naskah subtitle di atas. Ekstrak TEPAT ${count} adegan PALING SERU (berdasarkan teks dialog/kejadian di subtitle).
+
+ATURAN KETAT (HARGA MATI):
+1. Anda WAJIB memberikan "timestamp_adegan" (contoh: 00:15:30 -> 00:15:40) yang BENAR-BENAR ADA di dalam data subtitle yang saya berikan. JANGAN MENGARANG TIMESTAMP!
+2. Naskah Voice Over (Tone: ${tone}, Bahasa: ${lang}) untuk SETIAP KLIP dibatasi MAKSIMAL ${targetWordsPerKlip} KATA. JANGAN LEBIH!
+3. Anda WAJIB membuat tepat ${count} klip di dalam array JSON.
+
+Output HARUS format JSON (HANYA JSON):
+{
+  "movie": {
+    "title": "${title}",
+    "description": "Analisis adegan puncak berdasarkan subtitle selesai."
+  },
+  "clips": [
+    {
+      "id": 1,
+      "title": "Judul Adegan",
+      "timestamp_adegan": "00:00:00 -> 00:00:00 (WAJIB SESUAI SUBTITLE)",
+      "scene_description": "Deskripsi adegan berdasarkan dialog di detik tersebut",
+      "hype_level": 5,
+      "teks_statis_capcut": {
+        "judul_atas": "JUDUL ATAS",
+        "opsi_hook_bawah": ["Hook 1", "Hook 2", "Hook 3"]
+      },
+      "vo_script": "Teks narasi di sini. WAJIB MAKSIMAL ${targetWordsPerKlip} KATA."
+    }
+  ]
+}`;
 }
 
 function buildPrompt(title, synopsis, lang, tone, count, duration) {
