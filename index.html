@@ -83,17 +83,9 @@
         <label style="color: #ff4500; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px;">2. SINOPSIS LK21 (AGAR AI TIDAK NGARANG)</label>
         <textarea id="movieSynopsis" placeholder="Paste sinopsis lengkap dari LK21 di sini..." style="padding: 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; width: 100%; min-height: 120px; resize: vertical; outline: none; font-family: inherit; box-sizing: border-box;"></textarea>
       </div>
-      <button type="button" id="findScenesBtn" onclick="findScenes()" style="width: 100%; padding: 12px; background: var(--accent2); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">
+     <button id="analyzeBtn" onclick="startAnalysis()" style="width: 100%; padding: 16px; border-radius: 8px; background: #ff4500; color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer; border: none; margin-bottom: 20px;">
   🔍 CARI ADEGAN PUNCAK (REKOMENDASI AI)
 </button>
-
-<div id="recommendationArea" style="display: none; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px dashed var(--accent);">
-  <h4 style="margin-top: 0; margin-bottom: 10px; color: var(--gold);">💡 Rekomendasi Adegan (Pilih Salah Satu):</h4>
-  <div id="cardsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
-</div>
-      <button id="analyzeBtn" onclick="startAnalysis()" style="padding: 16px; border-radius: 8px; background: #ff4500; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; transition: 0.2s;">
-        ▶ ANALISIS SEKARANG
-      </button>
     </div>
     <div class="options-row">
       <div class="opt-group">
