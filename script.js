@@ -69,59 +69,53 @@ async function startAnalysis() {
 
 function buildPrompt(title, synopsis, lang, tone, count, duration) {
   // === RUMUS PEMBAGIAN DURASI & KATA OTOMATIS ===
-  // 1. Hitung jatah durasi per klip (Misal: 60 detik / 7 klip = ~8 detik per klip)
   const durasiPerKlip = Math.floor(duration / count); 
-  
-  // 2. Hitung target jumlah kata VO per klip agar presisi (8 detik * 2.16 = ~17 kata)
   const targetWordsPerKlip = Math.floor(durasiPerKlip * 2.16); 
   
-  return `Kamu adalah kreator YouTube Shorts ahli "Movie Commentary" dan Sutradara Video Profesional.
+  return `Anda adalah 'CineClip AI', Sutradara Short Video Profesional.
 
 JUDUL FILM: "${title}"
 SINOPSIS DARI USER: "${synopsis}"
 
 TUGAS UTAMA: 
-Buat SATU naskah video Shorts utuh berdurasi total ${duration} detik, yang DIPECAH menjadi TEPAT ${count} adegan (klip) secara berurutan.
+Pecah cerita di atas menjadi TEPAT ${count} adegan/klip. Total durasi video adalah ${duration} detik.
 
-ATURAN KETAT PEMILIHAN ADEGAN (VISUAL LOCK - WAJIB PATUH):
-1. ANTI-AWALAN MEMBOSANKAN: JANGAN PERNAH mengambil adegan pengenalan di awal film (menit 0-5) jika itu hanya dialog santai.
-2. KUNCI ADEGAN YANG NUSUK: Langsung lompat dan temukan adegan paling SERU/PUNCAK (menegangkan, komedi brutal, horor, plot twist gila).
-3. TEPAT ${count} KLIP: Pecah momen puncak tersebut menjadi TEPAT ${count} klip yang saling bersambung. JANGAN KURANG!
-4. TIMESTAMP AKURAT: Berikan perkiraan rentang waktu (timestamp) yang langsung merujuk ke momen puncak tersebut, BUKAN dari menit awal film.
+ATURAN KETAT PEMILIHAN ADEGAN (VISUAL LOCK):
+1. ANTI-AWALAN MEMBOSANKAN: JANGAN ambil adegan pengenalan di awal film (menit 0-5).
+2. KUNCI ADEGAN PUNCAK: Langsung lompat dan temukan adegan paling SERU (menegangkan, komedi brutal, horor, plot twist gila) berdasarkan sinopsis.
+3. JUMLAH KLIP: Anda WAJIB menghasilkan TEPAT ${count} klip. Tidak boleh kurang!
 
-ATURAN KETAT SCRIPT VOICE OVER & DURASI (PRESISI 100%):
-1. Durasi SETIAP KLIP/ADEGAN ditetapkan TEPAT ${durasiPerKlip} detik.
-2. BERDASARKAN DURASI TERSEBUT, Script Voice Over (Tone: ${tone}) dalam bahasa ${lang} UNTUK MASING-MASING KLIP HARUS terdiri dari TEPAT ${targetWordsPerKlip} KATA!
-3. JANGAN KURANG, JANGAN LEBIH! Hitung jumlah kata dengan teliti untuk setiap klip agar saat digabungkan, audio tidak terpotong.
-4. HOOK AWALAN: Pada klip id: 1, kata pertamanya WAJIB berupa kalimat "Hook" yang langsung mengomentari adegan ekstrem tersebut (Contoh: "Kalian nggak akan percaya adegan gila ini...").
+ATURAN KETAT SCRIPT VOICE OVER (PRESISI DURASI):
+1. Durasi SETIAP KLIP/ADEGAN adalah TEPAT ${durasiPerKlip} detik.
+2. Naskah Voice Over (VO) (Tone: ${tone}) dalam bahasa ${lang} untuk SETIAP KLIP dibatasi MAX ${targetWordsPerKlip} KATA! 
+3. JANGAN LEBIH DARI ${targetWordsPerKlip} KATA per klip agar saat digabungkan audionya pas dan tidak terpotong.
 
 Output HARUS format JSON (HANYA JSON):
 {
   "movie": {
     "title": "Judul film",
-    "year": "Tahun",
-    "genre": ["genre1"],
-    "director": "Sutradara",
     "description": "Sinopsis singkat",
     "total_duration": "${duration} detik"
   },
   "clips": [
+    // PERHATIAN AI: ANDA WAJIB MEMBUAT TEPAT ${count} OBJECT DI DALAM ARRAY INI! JANGAN HANYA 1!
     {
       "id": 1,
       "title": "Judul adegan",
-      "scene_description": "Deskripsi visual adegan puncak secara detail agar editor mudah memotongnya",
+      "scene_description": "Deskripsi visual adegan puncak",
       "timestamp_start": "00:25:00",
-      "timestamp_end": "00:25:08",
+      "timestamp_end": "00:25:${durasiPerKlip}",
       "duration_seconds": ${durasiPerKlip},
       "hype_level": 5,
-      "reason": "Alasan kenapa adegan ini sangat menegangkan/konyol",
+      "reason": "Alasan adegan seru",
       "teks_statis_capcut": {
-        "judul_atas": "JUDUL ATAS (Maks 4 kata kapital)",
+        "judul_atas": "JUDUL ATAS",
         "opsi_hook_bawah": ["Hook 1", "Hook 2", "Hook 3"]
       },
-      "vo_script": "Skrip VO dengan awalan Hook. WAJIB dihitung dan dipastikan panjangnya TEPAT sekitar ${targetWordsPerKlip} kata per klip. Tidak boleh lebih/kurang.",
-      "hashtags": ["#tag1", "#tag2"]
+      "vo_script": "Kata pertama wajib Hook. Panjang naskah ini WAJIB TEPAT sekitar ${targetWordsPerKlip} kata. Jangan kepanjangan!",
+      "hashtags": ["#tag1"]
     }
+    // AI WAJIB MELANJUTKAN MEMBUAT OBJECT UNTUK ID 2, ID 3, SAMPAI ID ${count} DI SINI!!!
   ]
 }`;
 }
