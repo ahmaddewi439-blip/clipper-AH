@@ -440,27 +440,27 @@ document.addEventListener('DOMContentLoaded', () => {
  
 });
 
-// --- PASTE MULAI DI SINI (BARIS 428) ---
-// --- FUNGSI SUPER COPY & BUKA TELEGRAM ---
+
+// --- FUNGSI SUPER COPY & BUKA TELEGRAM (VERSI YOUTUBE) ---
 async function kirimKeBot(waktu) {
     if (!waktu || waktu === 'Tidak ada data waktu' || waktu === 'undefined') {
         alert("❌ Waktu adegan tidak valid!");
         return;
     }
 
-    const url = prompt(`⚡ EKSEKUSI POTONG PC ⚡\nAdegan: ${waktu}\n\nMasukkan URL video (Gunakan YouTube atau link langsung MP4, BUKAN link halaman LK21):`);
+    // Prompt sekarang meminta link YouTube
+    const url = prompt(`⚡ EKSEKUSI POTONG PC ⚡\nAdegan: ${waktu}\n\nMasukkan link YOUTUBE (Contoh: https://youtu.be/...):`);
     
     if (!url) return; 
 
-    // Rakit pesan yang akan dikirim
+    // Rakit pesan
     const pesan = `/potong ${url} ${waktu}`;
     
-    // Copy pesan otomatis ke memori HP/PC Anda
     try {
         await navigator.clipboard.writeText(pesan);
-        alert("✅ Teks perintah berhasil di-COPY!\n\nKlik OK, Telegram akan terbuka. Silakan langsung PASTE (Tempel) dan kirim ke Bot Anda.");
+        alert("✅ Teks perintah berhasil di-COPY!\n\nKlik OK, Telegram akan terbuka. Silakan PASTE (Tempel) dan kirim ke Bot Anda.");
         
-        // Buka chat Bot Telegram langsung (Ganti 'CineClipper_Bot' dengan username bot Anda jika berbeda)
+        // Buka chat Bot Telegram
         window.open('https://t.me/CineClipper_Bot', '_blank');
     } catch (err) {
         alert("❌ Gagal mencopy otomatis. Silakan copy teks ini manual:\n\n" + pesan);
