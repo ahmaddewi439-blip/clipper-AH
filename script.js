@@ -472,4 +472,3 @@ async function kirimKeBot(waktu) {
         alert("❌ Gagal mengirim, cek koneksi internet Anda.");
     }
 }
-}
