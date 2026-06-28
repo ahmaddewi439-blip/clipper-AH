@@ -225,6 +225,16 @@ function parseResponse(raw) {
 }
 
 function renderResults(data, lang, duration) {
+  // Cari baris ini (sekitar baris 227):
+function renderResults(data, lang, duration) {
+    
+    // --- PASTE 1 BARIS INI TEPAT DI BAWAHNYA ---
+    localStorage.setItem('kuliClipper_hasil', JSON.stringify({ data, lang, duration }));
+
+    // ... (biarkan kode di bawahnya tetap seperti aslinya)
+    const { movie, clips } = data;
+    const metaEl = document.getElementById('movieMeta');
+    // ...
   const { movie, clips } = data;
   const metaEl = document.getElementById('movieMeta');
   metaEl.innerHTML = `
@@ -413,6 +423,17 @@ function loadStateFromStorage() {
 document.addEventListener('DOMContentLoaded', () => {
   loadStateFromStorage(); // Jalankan saat web pertama kali dimuat
 
+  const hasilLama = localStorage.getItem('kuliClipper_hasil');
+    if (hasilLama) {
+        try {
+            const { data, lang, duration } = JSON.parse(hasilLama);
+            // Panggil kembali tampilan tanpa perlu render ulang ke AI
+            renderResults(data, lang, duration); 
+        } catch (e) {
+            console.log("Tidak ada data lama");
+        }
+    }
+
   // Simpan tiap ada perubahan
   const inputsToTrack = ['movieTitle', 'movieSynopsis', 'voLang', 'voTone', 'clipCount', 'clipDuration'];
   inputsToTrack.forEach(id => {
@@ -424,11 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
  
 });
-
-// ... (kode Anda yang atas) ...
-        }
-    });
-}); // <--- Ini baris 426 Anda
 
 // --- PASTE MULAI DI SINI (BARIS 428) ---
 async function kirimKeBot(waktu) {
@@ -461,4 +477,5 @@ async function kirimKeBot(waktu) {
     } catch (e) {
         alert("❌ Gagal mengirim, cek koneksi internet Anda.");
     }
+}
 }
