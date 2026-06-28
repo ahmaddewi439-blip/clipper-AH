@@ -262,6 +262,9 @@ function renderResults(data, lang, duration) {
   <div style="font-weight:bold; color: #ffeb3b; background: rgba(255, 235, 59, 0.15); padding: 8px; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ffeb3b;">
     ⏳ WAKTU: ${clip.timestamp_adegan || 'Tidak ada data waktu'}
   </div>
+  <button onclick="kirimKeBot('${clip.timestamp_adegan}')" style="margin-top: 10px; background: #2ecc71; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+   ⚡ Eksekusi Potong di PC
+</button>
   <div class="scene-desc" style="font-weight:bold; color:var(--accent2);">${clip.scene_description || '-'}</div>
 </div>
         
