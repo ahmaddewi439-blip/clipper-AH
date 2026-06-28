@@ -441,34 +441,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- PASTE MULAI DI SINI (BARIS 428) ---
+// --- FUNGSI SUPER COPY & BUKA TELEGRAM ---
 async function kirimKeBot(waktu) {
-    // Kalau waktunya kosong, tolak
     if (!waktu || waktu === 'Tidak ada data waktu' || waktu === 'undefined') {
         alert("❌ Waktu adegan tidak valid!");
         return;
     }
 
-    // 1. Munculkan pop-up minta link video
-    const url = prompt(`⚡ KIRIM KE BOT PC ⚡\nAdegan: ${waktu}\n\nMasukkan URL/Link video mentahnya di bawah ini:`);
+    const url = prompt(`⚡ EKSEKUSI POTONG PC ⚡\nAdegan: ${waktu}\n\nMasukkan URL video (Gunakan YouTube atau link langsung MP4, BUKAN link halaman LK21):`);
     
-    // Kalau dibatalkan atau kosong, hentikan
     if (!url) return; 
 
-    // 2. Data Bot Anda
-    const BOT_TOKEN = '8633807429:AAGX694OcjcQ7s6xBL6FKXnKTRBNDM_vM_U'; 
-    const MY_ID = '8196598586';
-    
-    // 3. Rakit pesan untuk bot PC
+    // Rakit pesan yang akan dikirim
     const pesan = `/potong ${url} ${waktu}`;
     
+    // Copy pesan otomatis ke memori HP/PC Anda
     try {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: MY_ID, text: pesan })
-        });
-        alert("🚀 BINGO! Perintah meluncur ke PC Anda. Silakan buka Telegram di HP sekarang.");
-    } catch (e) {
-        alert("❌ Gagal mengirim, cek koneksi internet Anda.");
+        await navigator.clipboard.writeText(pesan);
+        alert("✅ Teks perintah berhasil di-COPY!\n\nKlik OK, Telegram akan terbuka. Silakan langsung PASTE (Tempel) dan kirim ke Bot Anda.");
+        
+        // Buka chat Bot Telegram langsung (Ganti 'CineClipper_Bot' dengan username bot Anda jika berbeda)
+        window.open('https://t.me/CineClipper_Bot', '_blank');
+    } catch (err) {
+        alert("❌ Gagal mencopy otomatis. Silakan copy teks ini manual:\n\n" + pesan);
     }
 }
