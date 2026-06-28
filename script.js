@@ -225,16 +225,10 @@ function parseResponse(raw) {
 }
 
 function renderResults(data, lang, duration) {
-  // Cari baris ini (sekitar baris 227):
-function renderResults(data, lang, duration) {
-    
+
     // --- PASTE 1 BARIS INI TEPAT DI BAWAHNYA ---
     localStorage.setItem('kuliClipper_hasil', JSON.stringify({ data, lang, duration }));
 
-    // ... (biarkan kode di bawahnya tetap seperti aslinya)
-    const { movie, clips } = data;
-    const metaEl = document.getElementById('movieMeta');
-    // ...
   const { movie, clips } = data;
   const metaEl = document.getElementById('movieMeta');
   metaEl.innerHTML = `
