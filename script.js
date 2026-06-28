@@ -422,18 +422,43 @@ document.addEventListener('DOMContentLoaded', () => {
       el.addEventListener('change', saveInputsToStorage);
     }
   });
-   // Tambahkan fungsi pemicu ini ke web Anda
-async function kirimKeBot(url, start, end) {
-    const BOT_TOKEN = '8145260196:AAHwA4zJZ57zNn7kC5yYpX2-d-cZ-22hHkE';
-    const MY_ID = '8196598586';
-    const pesan = `/potong ${url} ${start} -> ${end}`;
-    
-    // Web mengirim perintah langsung ke API Telegram
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: MY_ID, text: pesan })
-    });
-    alert("Perintah sudah dikirim ke Bot di PC Anda!");
-}
+ 
 });
+
+// ... (kode Anda yang atas) ...
+        }
+    });
+}); // <--- Ini baris 426 Anda
+
+// --- PASTE MULAI DI SINI (BARIS 428) ---
+async function kirimKeBot(waktu) {
+    // Kalau waktunya kosong, tolak
+    if (!waktu || waktu === 'Tidak ada data waktu' || waktu === 'undefined') {
+        alert("❌ Waktu adegan tidak valid!");
+        return;
+    }
+
+    // 1. Munculkan pop-up minta link video
+    const url = prompt(`⚡ KIRIM KE BOT PC ⚡\nAdegan: ${waktu}\n\nMasukkan URL/Link video mentahnya di bawah ini:`);
+    
+    // Kalau dibatalkan atau kosong, hentikan
+    if (!url) return; 
+
+    // 2. Data Bot Anda
+    const BOT_TOKEN = '8633807429:AAGX694OcjcQ7s6xBL6FKXnKTRBNDM_vM_U'; 
+    const MY_ID = '8196598586';
+    
+    // 3. Rakit pesan untuk bot PC
+    const pesan = `/potong ${url} ${waktu}`;
+    
+    try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: MY_ID, text: pesan })
+        });
+        alert("🚀 BINGO! Perintah meluncur ke PC Anda. Silakan buka Telegram di HP sekarang.");
+    } catch (e) {
+        alert("❌ Gagal mengirim, cek koneksi internet Anda.");
+    }
+}
