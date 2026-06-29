@@ -906,14 +906,3 @@ async function renderAllClips() {
 </script>
 </body>
 </html>'''
-
-with open('/mnt/agents/output/index-hybrid.html', 'w', encoding='utf-8') as f:
-    f.write(fixed_html)
-
-# Verify
-with open('/mnt/agents/output/index-hybrid.html', 'r', encoding='utf-8') as f:
-    content = f.read()
-
-print("File saved:", len(content), "chars")
-print("Ends with:", content[-30:])
-print("Contains Python:", 'Save to file' in content or 'ipython' in content)
