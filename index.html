@@ -414,6 +414,39 @@
 </style>
 
 </style>
+<style>
+/* === YOUTUBE PREVIEW CARD - PRO === */
+#youtube-preview-container { margin: 16px 0; }
+
+.yt-preview-skeleton {
+  display: flex; gap: 16px; padding: 16px;
+  background: #12122a; border-radius: 16px;
+  border: 1px solid #1e1e3a; margin-bottom: 16px;
+}
+.yt-skeleton-thumb { width: 280px; height: 158px; background: #1e1e3a; border-radius: 12px; animation: yt-shimmer 1.5s infinite; }
+.yt-skeleton-info { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.yt-skeleton-title { height: 20px; width: 70%; background: #1e1e3a; border-radius: 6px; animation: yt-shimmer 1.5s infinite; }
+.yt-skeleton-meta { height: 14px; width: 40%; background: #1e1e3a; border-radius: 4px; animation: yt-shimmer 1.5s infinite; }
+@keyframes yt-shimmer { 0% { background: #1e1e3a; } 50% { background: #2a2a4a; } 100% { background: #1e1e3a; } }
+
+.yt-preview-error { padding: 16px; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; border-radius: 12px; text-align: center; color: #e74c3c; margin-bottom: 16px; }
+
+.yt-preview-card { animation: yt-fade-in 0.4s ease; margin-bottom: 16px; }
+@keyframes yt-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.yt-card { background: #12122a; border: 1px solid #1e1e3a; border-radius: 16px; overflow: hidden; }
+.yt-thumbnail-wrap { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; }
+.yt-thumbnail { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.yt-duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: monospace; }
+.yt-info { padding: 18px; }
+.yt-title { font-size: 16px; font-weight: 700; color: #e0e0e0; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.yt-channel { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.yt-channel-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+.yt-channel-name { color: #8888aa; font-weight: 600; font-size: 13px; }
+.yt-meta { display: flex; gap: 10px; color: #666; font-size: 12px; margin-bottom: 12px; }
+.yt-btn-analyze { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.yt-btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+</style>
 <base target="_blank">
 </head>
 <body>
@@ -545,6 +578,85 @@
 
 <script>
 const API_URL = 'http://localhost:3000';
+
+/* === YOUTUBE PREVIEW CARD - PRO === */
+class YouTubePreviewCard {
+  constructor(containerId, options = {}) {
+    this.container = document.getElementById(containerId);
+    this.apiBaseUrl = options.apiBaseUrl || 'http://localhost:3000';
+    this.onAnalyze = options.onAnalyze || (() => {});
+    this.currentData = null;
+    this.init();
+  }
+  init() { this.container.innerHTML = ''; }
+  showLoading() {
+    this.container.innerHTML = `<div class="yt-preview-skeleton"><div class="yt-skeleton-thumb"></div><div class="yt-skeleton-info"><div class="yt-skeleton-title"></div><div class="yt-skeleton-meta"></div></div></div>`;
+  }
+  showError(message) {
+    this.container.innerHTML = `<div class="yt-preview-error"><div>⚠️ ${message}</div></div>`;
+  }
+  async loadVideo(url) {
+    this.showLoading();
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/youtube-info?url=${encodeURIComponent(url)}`);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+      this.currentData = result.data;
+      this.renderCard(result.data);
+    } catch (err) { this.showError(err.message); }
+  }
+  renderCard(data) {
+    this.container.innerHTML = `
+      <div class="yt-preview-card">
+        <div class="yt-card">
+          <div class="yt-thumbnail-wrap">
+            <img src="${data.thumbnail}" alt="${data.title}" class="yt-thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/480x360?text=No+Thumbnail'">
+            <span class="yt-duration">${data.duration}</span>
+          </div>
+          <div class="yt-info">
+            <h3 class="yt-title">${this.escapeHtml(data.title)}</h3>
+            <div class="yt-channel">
+              <div class="yt-channel-avatar">${data.channelName.charAt(0)}</div>
+              <div class="yt-channel-name">${this.escapeHtml(data.channelName)}</div>
+            </div>
+            <div class="yt-meta">
+              <span>👁 ${data.views} views</span>
+              <span>•</span>
+              <span>${data.publishedAt}</span>
+            </div>
+            <button class="yt-btn-analyze" onclick="previewCard.analyze()">🔍 Analisis Video Ini</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  analyze() {
+    if (this.currentData) {
+      document.getElementById('videoUrl').value = `https://youtube.com/watch?v=${this.currentData.id}`;
+      this.onAnalyze(this.currentData);
+    }
+  }
+  clear() { this.container.innerHTML = ''; this.currentData = null; }
+}
+
+const previewCard = new YouTubePreviewCard('youtube-preview-container', {
+  apiBaseUrl: API_URL,
+  onAnalyze: (videoData) => { console.log('Ready:', videoData); }
+});
+
+// Auto-load preview saat user ketik/paste URL (debounce 600ms)
+let ytDebounceTimer;
+document.getElementById('videoUrl').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  clearTimeout(ytDebounceTimer);
+  if (!url) { previewCard.clear(); return; }
+  if (!/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)/.test(url)) return;
+  ytDebounceTimer = setTimeout(() => previewCard.loadVideo(url), 600);
+});
 let currentAnalysis = null;
 
 function showError(msg) {
