@@ -1,165 +1,585 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineClipper AI Studio</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 30px; }
-        .container { max-width: 800px; margin: auto; background: #161b22; padding: 30px; border-radius: 12px; border: 1px solid #30363d; }
-        h1 { text-align: center; color: #58a6ff; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
-        button { background: #238636; color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; }
-        button:hover { background: #2ea043; }
-        .card { background: #21262d; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-top: 20px; display: none; }
-        .vo-box { background: #0d1117; padding: 15px; border-left: 4px solid #f0883e; margin-bottom: 15px; }
-        .thumb-box { background: #0d1117; padding: 15px; border-left: 4px solid #8957e5; margin-bottom: 15px; }
-        video { width: 100%; border-radius: 8px; margin-top: 15px; border: 2px solid #58a6ff; }
-        .btn-dl { background: #1f6feb; text-align: center; display: block; text-decoration: none; padding: 12px; border-radius: 6px; margin-top: 10px; font-weight: bold; color: white; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineClipper v2.0 - YouTube Clipper</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #ff6b6b, #feca57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+
+  .card {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #2a2a4a;
+  }
+
+  .input-group { margin-bottom: 16px; }
+  .input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    color: #a0a0c0;
+    font-weight: 600;
+  }
+  .input-group input, .input-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #3a3a5a;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus, .input-group select:focus {
+    border-color: #ff6b6b;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(40,167,69,0.3); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-render {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+    color: white;
+    margin-top: 12px;
+  }
+  .btn-render:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,107,0.3); }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+  }
+  .loading .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #2a2a4a;
+    border-top-color: #ff6b6b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .analysis-result { display: none; }
+  .analysis-result.show { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2a4a;
+  }
+  .result-header .icon { font-size: 1.5rem; }
+  .result-header h2 { font-size: 1.1rem; color: #4dabf7; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .info-item {
+    background: #0f0f1a;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #2a2a4a;
+  }
+  .info-item .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+  .info-item .value { font-size: 1rem; font-weight: 700; color: #fff; }
+
+  .section-title {
+    font-size: 0.9rem;
+    color: #a0a0c0;
+    margin: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .clip-card {
+    background: #0f0f1a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #2a2a4a;
+    border-left: 4px solid #4dabf7;
+    transition: all 0.2s;
+  }
+  .clip-card:hover { border-color: #ff6b6b; }
+  .clip-card.cta-clip { border-left-color: #ff6b6b; background: #1a0a0a; }
+  .clip-card.cta-end { border-left-color: #feca57; background: #1a1500; }
+
+  .clip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .clip-number {
+    background: #4dabf7;
+    color: #0f0f1a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .clip-time {
+    font-size: 0.8rem;
+    color: #888;
+    font-family: monospace;
+  }
+  .clip-cta-badge {
+    background: #ff6b6b;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .clip-narration {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #c0c0d0;
+    white-space: pre-line;
+  }
+  .clip-narration .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+  .tag-hook { background: #ff6b6b; color: white; }
+  .tag-sinopsis { background: #4dabf7; color: white; }
+  .tag-highlight { background: #a855f7; color: white; }
+  .tag-cta { background: #feca57; color: #1a1a00; }
+  .tag-transisi { background: #20c997; color: white; }
+
+  .thumbnail-section {
+    background: #0f0f1a;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #2a2a4a;
+  }
+  .thumbnail-prompt {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #c0c0d0;
+    background: #151525;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    border-left: 3px solid #feca57;
+  }
+  .thumbnail-tools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .tool-badge {
+    background: #2a2a4a;
+    color: #a0a0c0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+  }
+
+  .render-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #2a2a4a;
+  }
+  .render-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .render-option {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #2a2a4a;
+    background: #0f0f1a;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .render-option:hover { border-color: #4dabf7; }
+  .render-option.active { border-color: #ff6b6b; background: #1a0a0a; }
+  .render-option .icon { font-size: 1.5rem; margin-bottom: 4px; }
+  .render-option .label { font-size: 0.85rem; font-weight: 600; }
+  .render-option .desc { font-size: 0.75rem; color: #888; }
+
+  .video-result {
+    margin-top: 20px;
+    display: none;
+  }
+  .video-result.show { display: block; animation: fadeIn 0.4s ease; }
+  .video-result video {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #2a2a4a;
+  }
+  .download-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 24px;
+    background: #4dabf7;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .error-msg {
+    background: #1a0a0a;
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+
+  .render-status {
+    background: #0f0f1a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+    border: 1px solid #2a2a4a;
+  }
+  .render-status .status-text { color: #feca57; font-weight: 600; margin-top: 12px; }
+  .render-status .status-sub { color: #888; font-size: 0.85rem; margin-top: 4px; }
+
+  .lang-select-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .lang-select-group { grid-template-columns: 1fr; }
+    .render-options { flex-direction: column; }
+  }
+</style>
+<base target="_blank">
 </head>
 <body>
-
 <div class="container">
-    <h1>🎬 CineClipper AI Studio</h1>
-    
-    <label>Link YouTube (Movie/Drakor/Podcast):</label>
-    <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+  <h1>🎬 CINECLIPPER v2.0</h1>
+  <p class="subtitle">YouTube Movie & Drama Clipper dengan Multi-Bahasa</p>
 
-    <label>Target Durasi & Strategi Potong:</label>
-    <select id="durasi">
-        <option value="50 Detik (Wajib 4 Klip, 120-130 Kata)">🔥 Shorts 50 Detik (Vertikal 9:16)</option>
-        <option value="5 Menit (Wajib 7 Klip, 700-750 Kata)">📺 Long 5 Menit (Normal 16:9)</option>
-        <option value="10 Menit (Wajib 12 Klip, 1400-1500 Kata)">🍿 Long 10 Menit (Normal 16:9)</option>
-    </select>
-
-    <label>Bahasa Voice Over (Pasar Target):</label>
-    <select id="bahasa">
-        <option value="English (US)">English (US) - Tier 1</option>
-        <option value="German">German (Jerman) - Tier 1</option>
-        <option value="French">French (Prancis) - Tier 1</option>
-        <option value="Spanish">Spanish (Spanyol) - Tier 2</option>
-        <option value="Indonesian" selected>Indonesian (Indonesia) - Lokal</option>
-    </select>
-
-    <button onclick="prosesAI()">🚀 PROSES KONTEN VIRAL</button>
-    
-    <p id="statusLoading" style="text-align: center; color: #f2cc60; display: none;"></p>
-
-    <div id="hasilCard" class="card">
-        <h3 style="color: #58a6ff;">✅ Analisis Selesai! Merender Video...</h3>
-        
-        <div class="vo-box">
-            <h4>🎙️ Naskah Voice Over (<span id="outBahasa"></span>)</h4>
-            <p id="outVO" style="font-size: 14px; line-height: 1.6;"></p>
-        </div>
-
-        <div class="thumb-box">
-            <h4>🖼️ Prompt Thumbnail AI</h4>
-            <p id="outThumb" style="font-size: 14px; font-style: italic;"></p>
-        </div>
-
-        <div id="videoContainer">
-            </div>
+  <!-- STEP 1: INPUT -->
+  <div class="card" id="inputCard">
+    <div class="input-group">
+      <label>🔗 URL YouTube (Film, Drakor, Anime, dll)</label>
+      <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." />
     </div>
+
+    <div class="lang-select-group">
+      <div class="input-group">
+        <label>🌍 Pilih Bahasa Output</label>
+        <select id="language">
+          <optgroup label="Tier 1 (High RPM)">
+            <option value="en">🇺🇸 English</option>
+            <option value="ja">🇯🇵 日本語 (Jepang)</option>
+            <option value="de">🇩🇪 Deutsch (Jerman)</option>
+            <option value="fr">🇫🇷 Français (Prancis)</option>
+            <option value="ko">🇰🇷 한국어 (Korea)</option>
+          </optgroup>
+          <optgroup label="Tier 2 (Medium RPM)">
+            <option value="es">🇪🇸 Español (Spanyol)</option>
+            <option value="pt">🇵🇹 Português (Portugis)</option>
+            <option value="ru">🇷🇺 Русский (Rusia)</option>
+            <option value="ar">🇸🇦 العربية (Arab)</option>
+          </optgroup>
+          <optgroup label="Lokal">
+            <option value="id" selected>🇮🇩 Bahasa Indonesia</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>📐 Format Output</label>
+        <select id="format">
+          <option value="long">🎬 YouTube Long (16:9)</option>
+          <option value="short">📱 YouTube Shorts (9:16)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btnAnalyze" onclick="analyzeVideo()">
+      🔍 ANALISIS VIDEO
+    </button>
+
+    <div id="errorMsg"></div>
+  </div>
+
+  <!-- STEP 2: ANALYSIS RESULT -->
+  <div class="card analysis-result" id="analysisResult">
+    <div class="result-header">
+      <span class="icon">✅</span>
+      <h2>Analisis Selesai! Siap untuk Render</h2>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">🎬 Judul</div>
+        <div class="value" id="resTitle" style="font-size:0.85rem;">-</div>
+      </div>
+      <div class="info-item">
+        <div class="label">⏱️ Durasi</div>
+        <div class="value" id="resDuration">-</div>
+      </div>
+      <div class="info-item">
+        <div class="label">🎭 Genre</div>
+        <div class="value" id="resGenre">-</div>
+      </div>
+      <div class="info-item">
+        <div class="label">✂️ Jumlah Klip</div>
+        <div class="value" id="resClipCount">-</div>
+      </div>
+      <div class="info-item">
+        <div class="label">🌍 Bahasa</div>
+        <div class="value" id="resLang">-</div>
+      </div>
+    </div>
+
+    <div class="section-title">🎙️ Naskah Voice Over per Klip</div>
+    <div id="clipsContainer"></div>
+
+    <div class="section-title">🖼️ Prompt Thumbnail AI</div>
+    <div class="thumbnail-section">
+      <div class="label" style="color:#888;font-size:0.8rem;margin-bottom:8px;">Copy prompt ini ke Midjourney / DALL-E / Leonardo:</div>
+      <div class="thumbnail-prompt" id="thumbnailPrompt">-</div>
+      <div class="thumbnail-tools" id="thumbnailTools"></div>
+    </div>
+
+    <div class="render-section">
+      <div class="section-title">🎬 Render Video</div>
+      <div class="render-options">
+        <div class="render-option active" data-format="long" onclick="selectFormat(this)">
+          <div class="icon">🎬</div>
+          <div class="label">YouTube Long</div>
+          <div class="desc">16:9 Full HD</div>
+        </div>
+        <div class="render-option" data-format="short" onclick="selectFormat(this)">
+          <div class="icon">📱</div>
+          <div class="label">YouTube Shorts</div>
+          <div class="desc">9:16 Vertical</div>
+        </div>
+      </div>
+      <button class="btn btn-render" id="btnRender" onclick="renderVideo()">
+        🚀 RENDER & DOWNLOAD VIDEO
+      </button>
+
+      <div class="render-status" id="renderStatus" style="display:none;">
+        <div class="spinner"></div>
+        <div class="status-text">⏳ Sedang merender video...</div>
+        <div class="status-sub">Download & cut adegan sesuai naskah. Silakan tunggu.</div>
+      </div>
+
+      <div class="video-result" id="videoResult">
+        <div class="section-title">✅ Render Selesai!</div>
+        <video id="resultVideo" controls></video>
+        <br>
+        <a href="#" class="download-btn" id="downloadBtn" download>⬇️ Download Video</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// GANTI DENGAN API KEY OPENAI ANDA
-const OPENAI_API_KEY = "sk-dKk1gRLJv1-vBb15hnKMzQ"; 
+const API_URL = 'http://localhost:3000';
+let currentAnalysis = null;
+let selectedFormat = 'long';
 
-async function prosesAI() {
-    const url = document.getElementById('url').value;
-    const durasi = document.getElementById('durasi').value;
-    const bahasa = document.getElementById('bahasa').value;
-    const isShort = durasi.includes('50 Detik');
-    
-    if(!url) return alert("Masukkan Link YouTube!");
-
-    document.getElementById('statusLoading').style.display = 'block';
-    document.getElementById('statusLoading').innerText = "🧠 AI Sedang Membedah Emosi & Menulis Naskah... (Mohon tunggu)";
-    document.getElementById('hasilCard').style.display = 'none';
-    document.getElementById('videoContainer').innerHTML = "<p style='color:orange;'>⏳ Memerintahkan PC Lokal untuk merender video... Ini memakan waktu, silakan ngopi dulu.</p>";
-
-    const masterPrompt = `
-    Kamu adalah Master Editor UGC. Analisis permintaan berikut dan output HANYA dalam format JSON tulen (tanpa markdown \`\`\`json).
-    
-    Target Durasi: ${durasi}
-    Bahasa VO: ${bahasa}
-    
-    ATURAN JSON:
-    {
-      "clips": [{"start": "MM:SS", "end": "MM:SS"}],
-      "vo_script": "Teks naskah VO disini",
-      "thumbnail_prompt": "Teks prompt thumbnail bahasa inggris disini"
-    }
-
-    ATURAN MUTLAK:
-    1. Jumlah "clips" di dalam array WAJIB mengikuti Target Durasi (4 klip untuk 50dtk, 7 klip untuk 5mnt, 12 klip untuk 10mnt).
-    2. vo_script WAJIB berbahasa ${bahasa}. 
-    3. vo_script WAJIB menyisipkan ajakan subscribe SEBELUM membahas adegan klip ke-3, dan di akhir kalimat penutup.
-    4. Hitungan kata vo_script WAJIB patuh pada rentang Target Durasi.
-    5. thumbnail_prompt WAJIB berbahasa Inggris, detail, cinematic.
-    `;
-
-    try {
-        // Panggil OpenAI API (Bisa diganti Gemini API jika punya)
-        const response = await fetch("https://lite.koboillm.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "openai/gpt-4o-2024-05-13", // Pakai GPT-4 agar hitungan matematikanya pintar
-                messages: [{ role: "user", content: masterPrompt }],
-                temperature: 0.7
-            })
-        });
-
-        const data = await response.json();
-        const aiText = data.choices[0].message.content;
-        const aiData = JSON.parse(aiText);
-
-        // Tampilkan Hasil di Web
-        document.getElementById('statusLoading').style.display = 'none';
-        document.getElementById('hasilCard').style.display = 'block';
-        document.getElementById('outBahasa').innerText = bahasa;
-        document.getElementById('outVO').innerText = aiData.vo_script;
-        document.getElementById('outThumb').innerText = aiData.thumbnail_prompt;
-
-        // Tembak ke PC Lokal untuk Render
-        renderDiPC(url, aiData.clips, isShort);
-
-    } catch (err) {
-        document.getElementById('statusLoading').innerText = "❌ Gagal koneksi ke AI. Cek API Key OpenAI Anda.";
-        console.error(err);
-    }
+function showError(msg) {
+  document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
+}
+function clearError() {
+  document.getElementById('errorMsg').innerHTML = '';
 }
 
-async function renderDiPC(url, clips, isShort) {
-    try {
-        const response = await fetch('http://localhost:3000/api/potong-youtube', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, clips, isShort })
-        });
+async function analyzeVideo() {
+  const url = document.getElementById('videoUrl').value.trim();
+  const lang = document.getElementById('language').value;
 
-        const data = await response.json();
+  if (!url) { showError('Masukkan URL YouTube terlebih dahulu!'); return; }
+  if (!url.includes('youtube.com') && !url.includes('youtu.be')) { showError('URL harus dari YouTube!'); return; }
 
-        if (data.success) {
-            document.getElementById('videoContainer').innerHTML = `
-                <video controls autoplay>
-                    <source src="${data.videoUrl}" type="video/mp4">
-                </video>
-                <a href="${data.videoUrl}" download="Mentahan_CineClipper.mp4" class="btn-dl">⬇️ Download Video Mentahan</a>
-            `;
-        } else {
-            document.getElementById('videoContainer').innerHTML = "<p style='color:red;'>❌ Mesin PC gagal memproses video.</p>";
-        }
-    } catch (err) {
-        document.getElementById('videoContainer').innerHTML = "<p style='color:red;'>❌ PC tidak merespon. Pastikan CMD 'node server-clipper.js' MENYALA!</p>";
-    }
+  clearError();
+  const btn = document.getElementById('btnAnalyze');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:8px;"></div> Menganalisis...';
+
+  try {
+    const res = await fetch(`${API_URL}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, lang })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    currentAnalysis = data;
+    displayAnalysis(data);
+
+  } catch (err) {
+    showError('Gagal analisis: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 ANALISIS VIDEO';
+  }
+}
+
+function displayAnalysis(data) {
+  document.getElementById('resTitle').textContent = data.title;
+  document.getElementById('resDuration').textContent = data.durationFormatted;
+  document.getElementById('resGenre').textContent = data.genre.toUpperCase();
+  document.getElementById('resClipCount').textContent = data.clipCount + ' KLIP';
+  document.getElementById('resLang').textContent = data.language.name;
+
+  // Tampilkan klip
+  const container = document.getElementById('clipsContainer');
+  container.innerHTML = '';
+
+  data.narration.forEach((narr, idx) => {
+    const isClip3 = idx === 2;
+    const isLast = idx === data.narration.length - 1;
+    let cardClass = 'clip-card';
+    if (isClip3) cardClass += ' cta-clip';
+    if (isLast) cardClass += ' cta-end';
+
+    const textFormatted = narr.text
+      .replace(/\[HOOK\]/g, '<span class="tag tag-hook">HOOK</span>')
+      .replace(/\[SINOPSIS\]/g, '<span class="tag tag-sinopsis">SINOPSIS</span>')
+      .replace(/\[HIGHLIGHT\]/g, '<span class="tag tag-highlight">HIGHLIGHT</span>')
+      .replace(/\[CTA SUBSCRIBE\]/g, '<span class="tag tag-cta">CTA SUBSCRIBE</span>')
+      .replace(/\[CTA AKHIR\]/g, '<span class="tag tag-cta">CTA AKHIR</span>')
+      .replace(/\[TRANSISI\]/g, '<span class="tag tag-transisi">TRANSISI</span>');
+
+    const ctaBadge = (isClip3 || isLast) ? '<span class="clip-cta-badge">CTA</span>' : '';
+
+    container.innerHTML += `
+      <div class="${cardClass}">
+        <div class="clip-header">
+          <span class="clip-number">KLIP ${narr.clipIndex}</span>
+          ${ctaBadge}
+          <span class="clip-time">⏱️ ${narr.start} → ${narr.end}</span>
+        </div>
+        <div class="clip-narration">${textFormatted}</div>
+      </div>
+    `;
+  });
+
+  // Thumbnail prompt
+  document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
+  const toolsContainer = document.getElementById('thumbnailTools');
+  toolsContainer.innerHTML = data.thumbnail.tools.map(t => `<span class="tool-badge">${t}</span>`).join('');
+
+  // Tampilkan hasil
+  document.getElementById('analysisResult').classList.add('show');
+  document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectFormat(el) {
+  document.querySelectorAll('.render-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  selectedFormat = el.dataset.format;
+}
+
+async function renderVideo() {
+  if (!currentAnalysis) return;
+
+  const btn = document.getElementById('btnRender');
+  const status = document.getElementById('renderStatus');
+  const result = document.getElementById('videoResult');
+
+  btn.disabled = true;
+  btn.style.display = 'none';
+  status.style.display = 'block';
+  result.classList.remove('show');
+
+  try {
+    const res = await fetch(`${API_URL}/api/render`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: currentAnalysis.url,
+        clips: currentAnalysis.clips,
+        lang: document.getElementById('language').value,
+        isShort: selectedFormat === 'short'
+      })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    // Tampilkan video
+    const video = document.getElementById('resultVideo');
+    video.src = data.videoUrl;
+    document.getElementById('downloadBtn').href = data.videoUrl;
+    document.getElementById('downloadBtn').download = data.filename;
+
+    result.classList.add('show');
+    status.style.display = 'none';
+    btn.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '🔄 RENDER ULANG';
+
+  } catch (err) {
+    status.innerHTML = `<div class="error-msg">❌ Gagal render: ${err.message}</div>`;
+    btn.style.display = 'block';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
