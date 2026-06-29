@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CineClipper v2.1 - YouTube Clipper</title>
+<title>CineClipper v2.2 - YouTube Clipper</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0f0f1a;
+    background: #0a0a1a;
     color: #e0e0e0;
     min-height: 100vh;
     padding: 20px;
@@ -17,20 +17,20 @@
 
   h1 {
     text-align: center;
-    font-size: 2rem;
-    background: linear-gradient(90deg, #ff6b6b, #feca57);
+    font-size: 2.2rem;
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #ff6b6b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
-  .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+  .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 28px; }
 
   .card {
-    background: #1a1a2e;
+    background: #12122a;
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
-    border: 1px solid #2a2a4a;
+    border: 1px solid #1e1e3a;
   }
 
   .input-group { margin-bottom: 16px; }
@@ -38,23 +38,21 @@
     display: block;
     margin-bottom: 6px;
     font-size: 0.85rem;
-    color: #a0a0c0;
+    color: #8888aa;
     font-weight: 600;
   }
   .input-group input, .input-group select {
     width: 100%;
     padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid #3a3a5a;
-    background: #0f0f1a;
+    border: 1px solid #2a2a4a;
+    background: #0a0a1a;
     color: #e0e0e0;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.2s;
   }
-  .input-group input:focus, .input-group select:focus {
-    border-color: #ff6b6b;
-  }
+  .input-group input:focus, .input-group select:focus { border-color: #ff6b6b; }
 
   .btn {
     width: 100%;
@@ -76,20 +74,24 @@
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
   .btn-render {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
     margin-top: 12px;
   }
-  .btn-render:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,107,0.3); }
+  .btn-render:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231,76,60,0.3); }
 
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: #888;
+  .btn-enhance {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    padding: 10px;
   }
+  .btn-enhance:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(155,89,182,0.3); }
+
   .loading .spinner {
     width: 40px; height: 40px;
-    border: 3px solid #2a2a4a;
+    border: 3px solid #1e1e3a;
     border-top-color: #ff6b6b;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -107,139 +109,133 @@
     gap: 12px;
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #2a2a4a;
+    border-bottom: 1px solid #1e1e3a;
   }
   .result-header .icon { font-size: 1.5rem; }
   .result-header h2 { font-size: 1.1rem; color: #4dabf7; }
 
   .info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 12px;
     margin-bottom: 20px;
   }
   .info-item {
-    background: #0f0f1a;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid #2a2a4a;
+    background: #0a0a1a;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #1e1e3a;
+    text-align: center;
   }
-  .info-item .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
-  .info-item .value { font-size: 1rem; font-weight: 700; color: #fff; }
-  .info-item .value.durasi { color: #feca57; }
-  .info-item .value.klip { color: #ff6b6b; }
+  .info-item .label { font-size: 0.7rem; color: #666; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .info-item .value { font-size: 1.1rem; font-weight: 700; color: #fff; }
+  .info-item .value.accent { color: #feca57; }
+  .info-item .value.danger { color: #ff6b6b; }
 
   .section-title {
     font-size: 0.9rem;
-    color: #a0a0c0;
-    margin: 20px 0 12px;
+    color: #8888aa;
+    margin: 24px 0 14px;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 600;
   }
 
+  /* === KLIP CARD BARU: 1 PARAGRAF VO === */
   .clip-card {
-    background: #0f0f1a;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid #2a2a4a;
+    background: #0a0a1a;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+    border: 1px solid #1e1e3a;
     border-left: 4px solid #4dabf7;
     transition: all 0.2s;
+    position: relative;
   }
-  .clip-card:hover { border-color: #ff6b6b; }
-  .clip-card.cta-clip { border-left-color: #ff6b6b; background: #1a0a0a; }
-  .clip-card.cta-end { border-left-color: #feca57; background: #1a1500; }
+  .clip-card:hover { border-color: #ff6b6b; transform: translateX(4px); }
+  .clip-card.cta-clip { border-left-color: #e74c3c; background: linear-gradient(90deg, #1a0a0a 0%, #0a0a1a 100%); }
+  .clip-card.cta-end { border-left-color: #feca57; background: linear-gradient(90deg, #1a1500 0%, #0a0a1a 100%); }
 
   .clip-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
     gap: 8px;
   }
   .clip-number {
     background: #4dabf7;
-    color: #0f0f1a;
-    padding: 4px 12px;
+    color: #0a0a1a;
+    padding: 4px 14px;
     border-radius: 20px;
     font-size: 0.8rem;
-    font-weight: 700;
+    font-weight: 800;
   }
   .clip-meta {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
     flex-wrap: wrap;
   }
-  .clip-time {
-    font-size: 0.8rem;
-    color: #888;
-    font-family: monospace;
-  }
-  .clip-durasi {
-    background: #feca57;
-    color: #1a1a00;
-    padding: 2px 10px;
+  .clip-badge {
+    padding: 3px 10px;
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 700;
   }
-  .clip-vo {
-    background: #a855f7;
-    color: white;
-    padding: 2px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-  .clip-cta-badge {
-    background: #ff6b6b;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
+  .badge-durasi { background: #feca57; color: #1a1500; }
+  .badge-vo { background: #9b59b6; color: white; }
+  .badge-cta { background: #e74c3c; color: white; }
+  .badge-time { background: #1e1e3a; color: #8888aa; font-family: monospace; }
 
   .clip-narration {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #c0c0d0;
-    white-space: pre-line;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #c0c0d8;
+    background: #0f0f20;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border-left: 3px solid #4dabf7;
   }
-  .clip-narration .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
+  .clip-card.cta-clip .clip-narration { border-left-color: #e74c3c; }
+  .clip-card.cta-end .clip-narration { border-left-color: #feca57; }
+
+  .clip-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-small {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #2a2a4a;
+    background: #0f0f20;
+    color: #8888aa;
     font-size: 0.75rem;
-    font-weight: 700;
-    margin-right: 6px;
-    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .tag-hook { background: #ff6b6b; color: white; }
-  .tag-sinopsis { background: #4dabf7; color: white; }
-  .tag-highlight { background: #a855f7; color: white; }
-  .tag-cta { background: #feca57; color: #1a1a00; }
-  .tag-transisi { background: #20c997; color: white; }
+  .btn-small:hover { border-color: #9b59b6; color: #9b59b6; }
 
   .thumbnail-section {
-    background: #0f0f1a;
+    background: #0a0a1a;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid #2a2a4a;
+    border: 1px solid #1e1e3a;
   }
   .thumbnail-prompt {
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     font-size: 0.85rem;
     line-height: 1.6;
-    color: #c0c0d0;
-    background: #151525;
-    padding: 12px;
+    color: #b0b0c8;
+    background: #0f0f20;
+    padding: 14px;
     border-radius: 8px;
     margin-top: 8px;
     border-left: 3px solid #feca57;
+    word-break: break-word;
   }
   .thumbnail-tools {
     display: flex;
@@ -248,9 +244,9 @@
     margin-top: 12px;
   }
   .tool-badge {
-    background: #2a2a4a;
-    color: #a0a0c0;
-    padding: 4px 10px;
+    background: #1e1e3a;
+    color: #8888aa;
+    padding: 4px 12px;
     border-radius: 6px;
     font-size: 0.75rem;
   }
@@ -258,7 +254,7 @@
   .render-section {
     margin-top: 24px;
     padding-top: 20px;
-    border-top: 1px solid #2a2a4a;
+    border-top: 1px solid #1e1e3a;
   }
 
   .video-result {
@@ -269,23 +265,23 @@
   .video-result video {
     width: 100%;
     border-radius: 12px;
-    border: 1px solid #2a2a4a;
+    border: 1px solid #1e1e3a;
   }
   .download-btn {
     display: inline-block;
     margin-top: 12px;
-    padding: 10px 24px;
+    padding: 12px 28px;
     background: #4dabf7;
     color: white;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 10px;
+    font-weight: 700;
   }
 
   .error-msg {
     background: #1a0a0a;
-    border: 1px solid #ff6b6b;
-    color: #ff6b6b;
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
     padding: 12px 16px;
     border-radius: 10px;
     margin-top: 12px;
@@ -293,15 +289,15 @@
   }
 
   .render-status {
-    background: #0f0f1a;
+    background: #0a0a1a;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     margin-top: 16px;
     text-align: center;
-    border: 1px solid #2a2a4a;
+    border: 1px solid #1e1e3a;
   }
-  .render-status .status-text { color: #feca57; font-weight: 600; margin-top: 12px; }
-  .render-status .status-sub { color: #888; font-size: 0.85rem; margin-top: 4px; }
+  .render-status .status-text { color: #feca57; font-weight: 700; margin-top: 12px; font-size: 1.1rem; }
+  .render-status .status-sub { color: #666; font-size: 0.85rem; margin-top: 6px; }
 
   .lang-select-group {
     display: grid;
@@ -310,36 +306,39 @@
   }
 
   .rules-box {
-    background: #0f0f1a;
+    background: #0a0a1a;
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 14px 16px;
     margin-bottom: 16px;
-    border: 1px solid #2a2a4a;
+    border: 1px solid #1e1e3a;
     font-size: 0.8rem;
-    color: #888;
+    color: #666;
+    line-height: 1.6;
   }
   .rules-box strong { color: #feca57; }
+  .rules-box .rule-item { margin-bottom: 4px; }
 
   @media (max-width: 600px) {
     .lang-select-group { grid-template-columns: 1fr; }
     .clip-header { flex-direction: column; align-items: flex-start; }
+    .clip-actions { flex-direction: column; }
   }
 </style>
 <base target="_blank">
 </head>
 <body>
 <div class="container">
-  <h1>🎬 CINECLIPPER v2.1</h1>
-  <p class="subtitle">YouTube Movie & Drama Clipper dengan Multi-Bahasa</p>
+  <h1>🎬 CINECLIPPER v2.2</h1>
+  <p class="subtitle">Review Film & Drakor dengan Multi-Bahasa</p>
 
   <!-- STEP 1: INPUT -->
   <div class="card" id="inputCard">
     <div class="rules-box">
-      <strong>📋 RULES KLIP:</strong><br>
-      🎬 Short (≤1 menit) = <strong>4 klip</strong> × 15 detik &nbsp;|&nbsp;
-      🎬 5 menit = <strong>7 klip</strong> × ~43 detik &nbsp;|&nbsp;
-      🎬 10 menit = <strong>12 klip</strong> × ~50 detik<br>
-      🎙️ Narasi VO akan <strong>otomatis disesuaikan panjangnya</strong> dengan durasi tiap klip.
+      <div class="rule-item">📋 <strong>RULES KLIP:</strong></div>
+      <div class="rule-item">🎬 Short (≤1 menit) = <strong>4 klip</strong> × 15 detik</div>
+      <div class="rule-item">🎬 5 menit = <strong>7 klip</strong> × ~43 detik</div>
+      <div class="rule-item">🎬 10 menit = <strong>12 klip</strong> × ~50 detik</div>
+      <div class="rule-item">🎙️  1 klip = <strong>1 paragraf VO</strong> review alur film (dengan CTA di klip 3 & akhir)</div>
     </div>
 
     <div class="input-group">
@@ -349,20 +348,20 @@
 
     <div class="lang-select-group">
       <div class="input-group">
-        <label>🌍 Pilih Bahasa Output</label>
+        <label>🌍 Bahasa Output</label>
         <select id="language">
           <optgroup label="Tier 1 (High RPM)">
             <option value="en">🇺🇸 English</option>
-            <option value="ja">🇯🇵 日本語 (Jepang)</option>
-            <option value="de">🇩🇪 Deutsch (Jerman)</option>
-            <option value="fr">🇫🇷 Français (Prancis)</option>
-            <option value="ko">🇰🇷 한국어 (Korea)</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="ko">🇰🇷 한국어</option>
           </optgroup>
           <optgroup label="Tier 2 (Medium RPM)">
-            <option value="es">🇪🇸 Español (Spanyol)</option>
-            <option value="pt">🇵🇹 Português (Portugis)</option>
-            <option value="ru">🇷🇺 Русский (Rusia)</option>
-            <option value="ar">🇸🇦 العربية (Arab)</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="ar">🇸🇦 العربية</option>
           </optgroup>
           <optgroup label="Lokal">
             <option value="id" selected>🇮🇩 Bahasa Indonesia</option>
@@ -396,11 +395,11 @@
     <div class="info-grid">
       <div class="info-item">
         <div class="label">🎬 Judul</div>
-        <div class="value" id="resTitle" style="font-size:0.85rem;">-</div>
+        <div class="value" style="font-size:0.8rem;">-</div>
       </div>
       <div class="info-item">
         <div class="label">⏱️ Durasi Total</div>
-        <div class="value durasi" id="resDuration">-</div>
+        <div class="value accent" id="resDuration">-</div>
       </div>
       <div class="info-item">
         <div class="label">🎭 Genre</div>
@@ -408,11 +407,11 @@
       </div>
       <div class="info-item">
         <div class="label">✂️ Jumlah Klip</div>
-        <div class="value klip" id="resClipCount">-</div>
+        <div class="value danger" id="resClipCount">-</div>
       </div>
       <div class="info-item">
-        <div class="label">⏱️ Durasi per Klip</div>
-        <div class="value durasi" id="resClipDuration">-</div>
+        <div class="label">⏱️ Durasi/Klip</div>
+        <div class="value accent" id="resClipDuration">-</div>
       </div>
       <div class="info-item">
         <div class="label">🌍 Bahasa</div>
@@ -420,12 +419,12 @@
       </div>
     </div>
 
-    <div class="section-title">🎙️ Naskah Voice Over per Klip (Panjang = Durasi Klip)</div>
+    <div class="section-title">🎙️ Narasi Voice Over per Klip</div>
     <div id="clipsContainer"></div>
 
     <div class="section-title">🖼️ Prompt Thumbnail AI</div>
     <div class="thumbnail-section">
-      <div class="label" style="color:#888;font-size:0.8rem;margin-bottom:8px;">Copy prompt ini ke Midjourney / DALL-E / Leonardo:</div>
+      <div style="color:#666;font-size:0.8rem;margin-bottom:8px;">Copy prompt ke Midjourney / DALL-E / Leonardo:</div>
       <div class="thumbnail-prompt" id="thumbnailPrompt">-</div>
       <div class="thumbnail-tools" id="thumbnailTools"></div>
     </div>
@@ -499,14 +498,15 @@ async function analyzeVideo() {
 }
 
 function displayAnalysis(data) {
-  document.getElementById('resTitle').textContent = data.title;
   document.getElementById('resDuration').textContent = data.durationFormatted;
   document.getElementById('resGenre').textContent = data.genre.toUpperCase();
   document.getElementById('resClipCount').textContent = data.clipCount + ' KLIP';
   document.getElementById('resClipDuration').textContent = data.clipDuration + ' DETIK';
   document.getElementById('resLang').textContent = data.language.name;
 
-  // Tampilkan klip
+  // Update judul di info grid pertama
+  document.querySelector('.info-item:first-child .value').textContent = data.title;
+
   const container = document.getElementById('clipsContainer');
   container.innerHTML = '';
 
@@ -517,15 +517,8 @@ function displayAnalysis(data) {
     if (isClip3) cardClass += ' cta-clip';
     if (isLast) cardClass += ' cta-end';
 
-    const textFormatted = narr.text
-      .replace(/\[HOOK\]/g, '<span class="tag tag-hook">HOOK</span>')
-      .replace(/\[SINOPSIS\]/g, '<span class="tag tag-sinopsis">SINOPSIS</span>')
-      .replace(/\[HIGHLIGHT\]/g, '<span class="tag tag-highlight">HIGHLIGHT</span>')
-      .replace(/\[CTA SUBSCRIBE\]/g, '<span class="tag tag-cta">CTA SUBSCRIBE</span>')
-      .replace(/\[CTA AKHIR\]/g, '<span class="tag tag-cta">CTA AKHIR</span>')
-      .replace(/\[TRANSISI\]/g, '<span class="tag tag-transisi">TRANSISI</span>');
-
-    const ctaBadge = (isClip3 || isLast) ? '<span class="clip-cta-badge">CTA</span>' : '';
+    const ctaBadge = (isClip3 || isLast) ? '<span class="clip-badge badge-cta">CTA</span>' : '';
+    const ctaLabel = isClip3 ? 'CTA SUBSCRIBE' : isLast ? 'CTA AKHIR' : '';
 
     container.innerHTML += `
       <div class="${cardClass}">
@@ -533,24 +526,43 @@ function displayAnalysis(data) {
           <span class="clip-number">KLIP ${narr.clipIndex}</span>
           <div class="clip-meta">
             ${ctaBadge}
-            <span class="clip-durasi">⏱️ ${narr.durationSec} DETIK</span>
-            <span class="clip-vo">🎙️ ${narr.estimatedVO}</span>
-            <span class="clip-time">${narr.start} → ${narr.end}</span>
+            <span class="clip-badge badge-durasi">⏱️ ${narr.durationSec} DETIK</span>
+            <span class="clip-badge badge-vo">🎙️ ${narr.estimatedVO}</span>
+            <span class="clip-badge badge-time">${narr.start} → ${narr.end}</span>
           </div>
         </div>
-        <div class="clip-narration">${textFormatted}</div>
+        <div class="clip-narration">${narr.text}</div>
+        <div class="clip-actions">
+          <button class="btn-small" onclick="copyNarration(${idx})">📋 Copy VO</button>
+          <button class="btn-small" onclick="copyGPTPrompt(${idx})">🤖 Copy GPT Prompt</button>
+        </div>
       </div>
     `;
   });
 
-  // Thumbnail prompt
+  // Store narration for copy functions
+  window.currentNarration = data.narration;
+
   document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
   const toolsContainer = document.getElementById('thumbnailTools');
   toolsContainer.innerHTML = data.thumbnail.tools.map(t => `<span class="tool-badge">${t}</span>`).join('');
 
-  // Tampilkan hasil
   document.getElementById('analysisResult').classList.add('show');
   document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyNarration(idx) {
+  const text = window.currentNarration[idx].text;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('✅ Narasi VO disalin ke clipboard!');
+  });
+}
+
+function copyGPTPrompt(idx) {
+  const prompt = window.currentNarration[idx].gptPrompt;
+  navigator.clipboard.writeText(prompt).then(() => {
+    alert('✅ GPT Prompt disalin! Paste ke ChatGPT untuk enhance narasi.');
+  });
 }
 
 async function renderVideo() {
@@ -572,7 +584,6 @@ async function renderVideo() {
       body: JSON.stringify({
         url: currentAnalysis.url,
         clips: currentAnalysis.clips,
-        lang: document.getElementById('language').value,
         isShort: currentAnalysis.isShort
       })
     });
@@ -580,7 +591,6 @@ async function renderVideo() {
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
-    // Tampilkan video
     const video = document.getElementById('resultVideo');
     video.src = data.videoUrl;
     document.getElementById('downloadBtn').href = data.videoUrl;
