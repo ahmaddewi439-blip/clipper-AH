@@ -346,6 +346,73 @@
     .clip-header { flex-direction: column; align-items: flex-start; }
     .clip-actions { flex-direction: column; }
   }
+
+/* TAMBAHKAN INI SEBELUM </style> */
+
+.clip-preview {
+    margin-top: 14px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #2a2a4a;
+    background: #0a0a1a;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.clip-controls {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background: #0f0f20;
+}
+
+.btn-play, .btn-download {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-play {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.btn-play:hover, .btn-download:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.btn-play:disabled, .btn-download:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
 </style>
 <base target="_blank">
 </head>
@@ -455,10 +522,10 @@
     </div>
 
     <div class="render-section">
-      <div class="section-title">🎬 Render Video Final</div>
-      <button class="btn btn-render" id="btnRender" onclick="renderVideo()">
-        🚀 RENDER & DOWNLOAD VIDEO
-      </button>
+  <div class="section-title">🎬 Download Semua Klip</div>
+  <button class="btn btn-render" id="btnRender" onclick="renderAllClips()">
+    🚀 DOWNLOAD ALL CLIPS
+  </button>
 
       <div class="render-status" id="renderStatus" style="display:none;">
         <div class="spinner"></div>
@@ -535,15 +602,15 @@ function displayAnalysis(data) {
   const container = document.getElementById('clipsContainer');
   container.innerHTML = '';
 
-  data.narration.forEach((narr, idx) => {
+    data.narration.forEach((narr, idx) => {
     const isClip3 = idx === 2;
     const isLast = idx === data.narration.length - 1;
     let cardClass = 'clip-card';
     if (isClip3) cardClass += ' cta-clip';
     if (isLast) cardClass += ' cta-end';
-
+    
     const ctaBadge = (isClip3 || isLast) ? '<span class="clip-badge badge-cta">CTA</span>' : '';
-
+    
     container.innerHTML += `
       <div class="${cardClass}">
         <div class="clip-header">
@@ -556,13 +623,30 @@ function displayAnalysis(data) {
             <span class="clip-badge badge-time">${narr.start} → ${narr.end}</span>
           </div>
         </div>
+        
+        <!-- VIDEO PREVIEW -->
+        <div class="clip-preview">
+          <div class="video-wrapper">
+            <iframe id="video-${idx}" 
+                    src="" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <div class="clip-controls">
+            <button class="btn-play" id="btn-play-${idx}" onclick="playClip(${idx})">▶️ Play</button>
+            <button class="btn-download" id="btn-download-${idx}" onclick="downloadClip(${idx})">⬇️ Download Cut</button>
+          </div>
+        </div>
+        
         <div class="clip-narration" id="narr-text-${idx}">${narr.text}</div>
-
+        
         <div class="enhanced-result" id="enhanced-${idx}">
           <div class="enhanced-label">✨ Hasil AI (GPT-4o):</div>
           <div class="clip-narration enhanced-text" id="enhanced-text-${idx}"></div>
         </div>
-
+        
         <div class="clip-actions">
           <button class="btn-small" onclick="copyNarration(${idx})">📋 Copy VO</button>
           <button class="btn-small btn-enhance" id="btn-enhance-${idx}" onclick="enhanceNarration(${idx})">✨ Enhance AI</button>
@@ -571,6 +655,82 @@ function displayAnalysis(data) {
     `;
   });
 
+
+  // TAMBAHKAN INI SEBELUM window.currentNarration = data.narration;
+
+function extractVideoId(url) {
+    if (url.includes('youtube.com/watch?v=')) {
+        return url.split('v=')[1].split('&')[0];
+    } else if (url.includes('youtu.be/')) {
+        return url.split('youtu.be/')[1].split('?')[0];
+    }
+    return '';
+}
+
+function timeToSeconds(timeStr) {
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+    return parts[0]*60 + parts[1];
+}
+
+function loadVideoPreviews() {
+    const videoId = extractVideoId(currentAnalysis.url);
+    if (!videoId) return;
+    
+    currentAnalysis.clips.forEach((clip, idx) => {
+        const iframe = document.getElementById(`video-${idx}`);
+        if (iframe) {
+            const startSec = timeToSeconds(clip.start);
+            const endSec = timeToSeconds(clip.end);
+            iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startSec}&end=${endSec}&autoplay=0&rel=0`;
+        }
+    });
+}
+
+function playClip(idx) {
+    const iframe = document.getElementById(`video-${idx}`);
+    const currentSrc = iframe.src;
+    iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
+    document.getElementById(`btn-play-${idx}`).innerHTML = '⏸️ Playing...';
+}
+
+async function downloadClip(idx) {
+    const clip = currentAnalysis.clips[idx];
+    const btn = document.getElementById(`btn-download-${idx}`);
+    
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Processing...';
+    
+    try {
+        const res = await fetch(`${API_URL}/api/render-single`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                url: currentAnalysis.url,
+                clip: clip,
+                isShort: currentAnalysis.isShort
+            })
+        });
+        
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        
+        const a = document.createElement('a');
+        a.href = data.videoUrl;
+        a.download = data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        btn.innerHTML = '✅ Downloaded';
+        
+    } catch (err) {
+        alert('❌ Gagal download: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '⬇️ Download Cut';
+    }
+}
+
   window.currentNarration = data.narration;
 
   document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
@@ -578,6 +738,9 @@ function displayAnalysis(data) {
   toolsContainer.innerHTML = data.thumbnail.tools.map(t => `<span class="tool-badge">${t}</span>`).join('');
 
   document.getElementById('analysisResult').classList.add('show');
+  // TAMBAHKAN INI SEBELUM scrollIntoView
+loadVideoPreviews();
+
   document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth' });
 }
 
