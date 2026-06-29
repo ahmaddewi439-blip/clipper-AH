@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+# Let me create the fixed HTML file
+fixed_html = '''<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -341,46 +343,39 @@
   .rules-box strong { color: #feca57; }
   .rules-box .rule-item { margin-bottom: 4px; }
 
-  @media (max-width: 600px) {
-    .lang-select-group { grid-template-columns: 1fr; }
-    .clip-header { flex-direction: column; align-items: flex-start; }
-    .clip-actions { flex-direction: column; }
-  }
-
-
-<style>
-.clip-preview {
+  /* === CLIP PREVIEW === */
+  .clip-preview {
     margin-top: 14px;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid #2a2a4a;
     background: #0a0a1a;
-}
+  }
 
-.video-wrapper {
+  .video-wrapper {
     position: relative;
     padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
-}
+  }
 
-.video-wrapper iframe {
+  .video-wrapper iframe {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     border: none;
-}
+  }
 
-.clip-controls {
+  .clip-controls {
     display: flex;
     gap: 10px;
     padding: 12px;
     background: #0f0f20;
-}
+  }
 
-.btn-play, .btn-download {
+  .btn-play, .btn-download {
     flex: 1;
     padding: 10px;
     border-radius: 8px;
@@ -389,63 +384,68 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
-}
+  }
 
-.btn-play {
+  .btn-play {
     background: linear-gradient(135deg, #28a745, #20c997);
     color: white;
-}
+  }
 
-.btn-download {
+  .btn-download {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
-}
+  }
 
-.btn-play:hover, .btn-download:hover {
+  .btn-play:hover, .btn-download:hover {
     transform: translateY(-2px);
     opacity: 0.9;
-}
+  }
 
-.btn-play:disabled, .btn-download:disabled {
+  .btn-play:disabled, .btn-download:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-}
-</style>
+  }
 
-</style>
-<style>
-/* === YOUTUBE PREVIEW CARD - PRO === */
-#youtube-preview-container { margin: 16px 0; }
+  /* === YOUTUBE PREVIEW CARD - PRO === */
+  #youtube-preview-container { margin: 16px 0; }
 
-.yt-preview-skeleton {
-  display: flex; gap: 16px; padding: 16px;
-  background: #12122a; border-radius: 16px;
-  border: 1px solid #1e1e3a; margin-bottom: 16px;
-}
-.yt-skeleton-thumb { width: 280px; height: 158px; background: #1e1e3a; border-radius: 12px; animation: yt-shimmer 1.5s infinite; }
-.yt-skeleton-info { flex: 1; display: flex; flex-direction: column; gap: 12px; }
-.yt-skeleton-title { height: 20px; width: 70%; background: #1e1e3a; border-radius: 6px; animation: yt-shimmer 1.5s infinite; }
-.yt-skeleton-meta { height: 14px; width: 40%; background: #1e1e3a; border-radius: 4px; animation: yt-shimmer 1.5s infinite; }
-@keyframes yt-shimmer { 0% { background: #1e1e3a; } 50% { background: #2a2a4a; } 100% { background: #1e1e3a; } }
+  .yt-preview-skeleton {
+    display: flex; gap: 16px; padding: 16px;
+    background: #12122a; border-radius: 16px;
+    border: 1px solid #1e1e3a; margin-bottom: 16px;
+  }
+  .yt-skeleton-thumb { width: 280px; height: 158px; background: #1e1e3a; border-radius: 12px; animation: yt-shimmer 1.5s infinite; }
+  .yt-skeleton-info { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  .yt-skeleton-title { height: 20px; width: 70%; background: #1e1e3a; border-radius: 6px; animation: yt-shimmer 1.5s infinite; }
+  .yt-skeleton-meta { height: 14px; width: 40%; background: #1e1e3a; border-radius: 4px; animation: yt-shimmer 1.5s infinite; }
+  @keyframes yt-shimmer { 0% { background: #1e1e3a; } 50% { background: #2a2a4a; } 100% { background: #1e1e3a; } }
 
-.yt-preview-error { padding: 16px; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; border-radius: 12px; text-align: center; color: #e74c3c; margin-bottom: 16px; }
+  .yt-preview-error { padding: 16px; background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; border-radius: 12px; text-align: center; color: #e74c3c; margin-bottom: 16px; }
 
-.yt-preview-card { animation: yt-fade-in 0.4s ease; margin-bottom: 16px; }
-@keyframes yt-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .yt-preview-card { animation: yt-fade-in 0.4s ease; margin-bottom: 16px; }
+  @keyframes yt-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.yt-card { background: #12122a; border: 1px solid #1e1e3a; border-radius: 16px; overflow: hidden; }
-.yt-thumbnail-wrap { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; }
-.yt-thumbnail { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-.yt-duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: monospace; }
-.yt-info { padding: 18px; }
-.yt-title { font-size: 16px; font-weight: 700; color: #e0e0e0; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.yt-channel { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.yt-channel-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
-.yt-channel-name { color: #8888aa; font-weight: 600; font-size: 13px; }
-.yt-meta { display: flex; gap: 10px; color: #666; font-size: 12px; margin-bottom: 12px; }
-.yt-btn-analyze { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.yt-btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+  .yt-card { background: #12122a; border: 1px solid #1e1e3a; border-radius: 16px; overflow: hidden; }
+  .yt-thumbnail-wrap { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; }
+  .yt-thumbnail { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+  .yt-duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: monospace; }
+  .yt-info { padding: 18px; }
+  .yt-title { font-size: 16px; font-weight: 700; color: #e0e0e0; margin: 0 0 10px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .yt-channel { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .yt-channel-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+  .yt-channel-name { color: #8888aa; font-weight: 600; font-size: 13px; }
+  .yt-meta { display: flex; gap: 10px; color: #666; font-size: 12px; margin-bottom: 12px; }
+  .yt-btn-analyze { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .yt-btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+
+  @media (max-width: 600px) {
+    .lang-select-group { grid-template-columns: 1fr; }
+    .clip-header { flex-direction: column; align-items: flex-start; }
+    .clip-actions { flex-direction: column; }
+    .yt-preview-skeleton { flex-direction: column; }
+    .yt-skeleton-thumb { width: 100%; height: 200px; }
+  }
 </style>
 <base target="_blank">
 </head>
@@ -472,7 +472,6 @@
     <div id="youtube-preview-container"></div>
 
     <div class="lang-select-group">
-     
       <div class="input-group">
         <label>🌍 Bahasa Output</label>
         <select id="language">
@@ -557,10 +556,10 @@
     </div>
 
     <div class="render-section">
-  <div class="section-title">🎬 Download Semua Klip</div>
-  <button class="btn btn-render" id="btnRender" onclick="renderAllClips()">
-    🚀 DOWNLOAD ALL CLIPS
-  </button>
+      <div class="section-title">🎬 Download Semua Klip</div>
+      <button class="btn btn-render" id="btnRender" onclick="renderAllClips()">
+        🚀 DOWNLOAD ALL CLIPS
+      </button>
 
       <div class="render-status" id="renderStatus" style="display:none;">
         <div class="spinner"></div>
@@ -580,6 +579,7 @@
 
 <script>
 const API_URL = 'http://localhost:3000';
+let currentAnalysis = null;
 
 /* === YOUTUBE PREVIEW CARD - PRO === */
 class YouTubePreviewCard {
@@ -590,11 +590,19 @@ class YouTubePreviewCard {
     this.currentData = null;
     this.init();
   }
-  init() { this.container.innerHTML = ''; }
+  init() {
+    if (!this.container) {
+      console.error('[YouTubePreview] Container #youtube-preview-container tidak ditemukan!');
+      return;
+    }
+    this.container.innerHTML = '';
+  }
   showLoading() {
+    if (!this.container) return;
     this.container.innerHTML = `<div class="yt-preview-skeleton"><div class="yt-skeleton-thumb"></div><div class="yt-skeleton-info"><div class="yt-skeleton-title"></div><div class="yt-skeleton-meta"></div></div></div>`;
   }
   showError(message) {
+    if (!this.container) return;
     this.container.innerHTML = `<div class="yt-preview-error"><div>⚠️ ${message}</div></div>`;
   }
   async loadVideo(url) {
@@ -608,6 +616,7 @@ class YouTubePreviewCard {
     } catch (err) { this.showError(err.message); }
   }
   renderCard(data) {
+    if (!this.container) return;
     this.container.innerHTML = `
       <div class="yt-preview-card">
         <div class="yt-card">
@@ -642,7 +651,12 @@ class YouTubePreviewCard {
       this.onAnalyze(this.currentData);
     }
   }
-  clear() { this.container.innerHTML = ''; this.currentData = null; }
+  clear() { 
+    if (this.container) {
+      this.container.innerHTML = ''; 
+      this.currentData = null; 
+    }
+  }
 }
 
 const previewCard = new YouTubePreviewCard('youtube-preview-container', {
@@ -659,7 +673,6 @@ document.getElementById('videoUrl').addEventListener('input', (e) => {
   if (!/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)/.test(url)) return;
   ytDebounceTimer = setTimeout(() => previewCard.loadVideo(url), 600);
 });
-let currentAnalysis = null;
 
 function showError(msg) {
   document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
@@ -671,7 +684,7 @@ function clearError() {
 async function analyzeVideo() {
   const url = document.getElementById('videoUrl').value.trim();
   const lang = document.getElementById('language').value;
-  const format = document.getElementById('format').value; // Mengambil nilai short/medium/long
+  const format = document.getElementById('format').value;
 
   if (!url) { showError('Masukkan URL YouTube terlebih dahulu!'); return; }
   if (!url.includes('youtube.com') && !url.includes('youtu.be')) { showError('URL harus dari YouTube!'); return; }
@@ -685,16 +698,14 @@ async function analyzeVideo() {
     const res = await fetch(`${API_URL}/api/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, lang, format }) // Mengirimkan "format" ke server
+      body: JSON.stringify({ url, lang, format })
     });
 
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
     currentAnalysis = data;
-    // Menyimpan format agar bisa dipakai saat render nanti
     currentAnalysis.format = format; 
-    
     displayAnalysis(data);
 
   } catch (err) {
@@ -702,6 +713,79 @@ async function analyzeVideo() {
   } finally {
     btn.disabled = false;
     btn.innerHTML = '🔍 ANALISIS VIDEO';
+  }
+}
+
+function extractVideoId(url) {
+  if (url.includes('youtube.com/watch?v=')) {
+    return url.split('v=')[1].split('&')[0];
+  } else if (url.includes('youtu.be/')) {
+    return url.split('youtu.be/')[1].split('?')[0];
+  }
+  return '';
+}
+
+function timeToSeconds(timeStr) {
+  const parts = timeStr.split(':').map(Number);
+  if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+  return parts[0]*60 + parts[1];
+}
+
+function loadVideoPreviews() {
+  const videoId = extractVideoId(currentAnalysis.url);
+  if (!videoId) return;
+  
+  currentAnalysis.clips.forEach((clip, idx) => {
+    const iframe = document.getElementById(`video-${idx}`);
+    if (iframe) {
+      const startSec = timeToSeconds(clip.start);
+      const endSec = timeToSeconds(clip.end);
+      iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startSec}&end=${endSec}&autoplay=0&rel=0`;
+    }
+  });
+}
+
+function playClip(idx) {
+  const iframe = document.getElementById(`video-${idx}`);
+  const currentSrc = iframe.src;
+  iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
+  document.getElementById(`btn-play-${idx}`).innerHTML = '⏸️ Playing...';
+}
+
+async function downloadClip(idx) {
+  const clip = currentAnalysis.clips[idx];
+  const btn = document.getElementById(`btn-download-${idx}`);
+  
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Processing...';
+  
+  try {
+    const res = await fetch(`${API_URL}/api/render-single`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: currentAnalysis.url,
+        clip: clip,
+        isShort: currentAnalysis.isShort
+      })
+    });
+    
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    
+    const a = document.createElement('a');
+    a.href = data.videoUrl;
+    a.download = data.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    btn.innerHTML = '✅ Downloaded';
+    
+  } catch (err) {
+    alert('❌ Gagal download: ' + err.message);
+    btn.disabled = false;
+    btn.innerHTML = '⬇️ Download Cut';
   }
 }
 
@@ -716,7 +800,7 @@ function displayAnalysis(data) {
   const container = document.getElementById('clipsContainer');
   container.innerHTML = '';
 
-    data.narration.forEach((narr, idx) => {
+  data.narration.forEach((narr, idx) => {
     const isClip3 = idx === 2;
     const isLast = idx === data.narration.length - 1;
     let cardClass = 'clip-card';
@@ -738,7 +822,6 @@ function displayAnalysis(data) {
           </div>
         </div>
         
-        <!-- VIDEO PREVIEW -->
         <div class="clip-preview">
           <div class="video-wrapper">
             <iframe id="video-${idx}" 
@@ -769,82 +852,6 @@ function displayAnalysis(data) {
     `;
   });
 
-
-  // TAMBAHKAN INI SEBELUM window.currentNarration = data.narration;
-
-function extractVideoId(url) {
-    if (url.includes('youtube.com/watch?v=')) {
-        return url.split('v=')[1].split('&')[0];
-    } else if (url.includes('youtu.be/')) {
-        return url.split('youtu.be/')[1].split('?')[0];
-    }
-    return '';
-}
-
-function timeToSeconds(timeStr) {
-    const parts = timeStr.split(':').map(Number);
-    if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
-    return parts[0]*60 + parts[1];
-}
-
-function loadVideoPreviews() {
-    const videoId = extractVideoId(currentAnalysis.url);
-    if (!videoId) return;
-    
-    currentAnalysis.clips.forEach((clip, idx) => {
-        const iframe = document.getElementById(`video-${idx}`);
-        if (iframe) {
-            const startSec = timeToSeconds(clip.start);
-            const endSec = timeToSeconds(clip.end);
-            iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startSec}&end=${endSec}&autoplay=0&rel=0`;
-        }
-    });
-}
-
-function playClip(idx) {
-    const iframe = document.getElementById(`video-${idx}`);
-    const currentSrc = iframe.src;
-    iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
-    document.getElementById(`btn-play-${idx}`).innerHTML = '⏸️ Playing...';
-}
-
-async function downloadClip(idx) {
-    const clip = currentAnalysis.clips[idx];
-    const btn = document.getElementById(`btn-download-${idx}`);
-    
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Processing...';
-    
-    try {
-        const res = await fetch(`${API_URL}/api/render-single`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                url: currentAnalysis.url,
-                clip: clip,
-                isShort: currentAnalysis.isShort
-            })
-        });
-        
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
-        
-        const a = document.createElement('a');
-        a.href = data.videoUrl;
-        a.download = data.filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        
-        btn.innerHTML = '✅ Downloaded';
-        
-    } catch (err) {
-        alert('❌ Gagal download: ' + err.message);
-        btn.disabled = false;
-        btn.innerHTML = '⬇️ Download Cut';
-    }
-}
-
   window.currentNarration = data.narration;
 
   document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
@@ -852,9 +859,7 @@ async function downloadClip(idx) {
   toolsContainer.innerHTML = data.thumbnail.tools.map(t => `<span class="tool-badge">${t}</span>`).join('');
 
   document.getElementById('analysisResult').classList.add('show');
-  // TAMBAHKAN INI SEBELUM scrollIntoView
-loadVideoPreviews();
-
+  loadVideoPreviews();
   document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -866,50 +871,49 @@ function copyNarration(idx) {
 }
 
 async function enhanceNarration(idx) {
-    const narr = window.currentNarration[idx];
-    const btn = document.getElementById(`btn-enhance-${idx}`);
-    const resultDiv = document.getElementById(`enhanced-${idx}`);
-    const enhancedTextDiv = document.getElementById(`enhanced-text-${idx}`);
-    const originalTextDiv = document.getElementById(`narr-text-${idx}`);
+  const narr = window.currentNarration[idx];
+  const btn = document.getElementById(`btn-enhance-${idx}`);
+  const resultDiv = document.getElementById(`enhanced-${idx}`);
+  const enhancedTextDiv = document.getElementById(`enhanced-text-${idx}`);
 
-    btn.disabled = true;
-    btn.innerHTML = '⏳ AI Memproses...';
+  btn.disabled = true;
+  btn.innerHTML = '⏳ AI Memproses...';
 
-    try {
-        const res = await fetch(`${API_URL}/api/enhance-narration`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                text: narr.text,
-                title: currentAnalysis.title,
-                genre: currentAnalysis.genre,
-                lang: document.getElementById('language').value,
-                durationSec: narr.durationSec
-            })
-        });
+  try {
+    const res = await fetch(`${API_URL}/api/enhance-narration`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: narr.text,
+        title: currentAnalysis.title,
+        genre: currentAnalysis.genre,
+        lang: document.getElementById('language').value,
+        durationSec: narr.durationSec
+      })
+    });
 
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
 
-        resultDiv.style.display = 'block';
-        enhancedTextDiv.textContent = data.enhanced;
+    resultDiv.style.display = 'block';
+    enhancedTextDiv.textContent = data.enhanced;
 
-        window.currentNarration[idx].text = data.enhanced;
-        window.currentNarration[idx].isEnhanced = true;
+    window.currentNarration[idx].text = data.enhanced;
+    window.currentNarration[idx].isEnhanced = true;
 
-        const badgeContainer = document.getElementById(`badge-ai-${idx}`);
-        badgeContainer.innerHTML = '<span class="ai-badge">✨ AI</span>';
+    const badgeContainer = document.getElementById(`badge-ai-${idx}`);
+    badgeContainer.innerHTML = '<span class="ai-badge">✨ AI</span>';
 
-        btn.innerHTML = '✅ Enhanced';
+    btn.innerHTML = '✅ Enhanced';
 
-    } catch (err) {
-        alert('❌ Gagal enhance: ' + err.message);
-        btn.disabled = false;
-        btn.innerHTML = '✨ Enhance AI';
-    }
+  } catch (err) {
+    alert('❌ Gagal enhance: ' + err.message);
+    btn.disabled = false;
+    btn.innerHTML = '✨ Enhance AI';
+  }
 }
 
-async function renderVideo() {
+async function renderAllClips() {
   if (!currentAnalysis) return;
 
   const btn = document.getElementById('btnRender');
@@ -928,8 +932,8 @@ async function renderVideo() {
       body: JSON.stringify({
         url: currentAnalysis.url,
         clips: currentAnalysis.clips,
-        format: currentAnalysis.format, // Mengirim format saat render
-        isShort: currentAnalysis.format === 'short' // Penentu ukuran rasio video 9:16 atau 16:9
+        format: currentAnalysis.format,
+        isShort: currentAnalysis.format === 'short'
       })
     });
 
@@ -955,4 +959,11 @@ async function renderVideo() {
 }
 </script>
 </body>
-</html>
+</html>'''
+
+# Save to file
+with open('/mnt/agents/output/index-fixed.html', 'w', encoding='utf-8') as f:
+    f.write(fixed_html)
+
+print("File saved successfully!")
+print(f"Total characters: {len(fixed_html)}")
