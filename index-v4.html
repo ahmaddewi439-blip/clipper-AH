@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CineClipper v2.2 - YouTube Clipper</title>
+<title>CineClipper v2.3 - AI Enhanced</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -80,15 +80,6 @@
   }
   .btn-render:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231,76,60,0.3); }
 
-  .btn-enhance {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    color: white;
-    margin-top: 8px;
-    font-size: 0.85rem;
-    padding: 10px;
-  }
-  .btn-enhance:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(155,89,182,0.3); }
-
   .loading .spinner {
     width: 40px; height: 40px;
     border: 3px solid #1e1e3a;
@@ -142,7 +133,7 @@
     font-weight: 600;
   }
 
-  /* === KLIP CARD BARU: 1 PARAGRAF VO === */
+  /* === KLIP CARD === */
   .clip-card {
     background: #0a0a1a;
     border-radius: 14px;
@@ -189,6 +180,7 @@
   .badge-vo { background: #9b59b6; color: white; }
   .badge-cta { background: #e74c3c; color: white; }
   .badge-time { background: #1e1e3a; color: #8888aa; font-family: monospace; }
+  .ai-badge { background: #9b59b6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
 
   .clip-narration {
     font-size: 0.95rem;
@@ -202,10 +194,30 @@
   .clip-card.cta-clip .clip-narration { border-left-color: #e74c3c; }
   .clip-card.cta-end .clip-narration { border-left-color: #feca57; }
 
+  /* === AI ENHANCE RESULT === */
+  .enhanced-result {
+    margin-top: 12px;
+    padding: 14px;
+    background: #0f0f25;
+    border-radius: 10px;
+    border-left: 3px solid #9b59b6;
+    display: none;
+  }
+  .enhanced-label {
+    color: #9b59b6;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .enhanced-text {
+    border-left-color: #9b59b6 !important;
+  }
+
   .clip-actions {
     margin-top: 12px;
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
   }
   .btn-small {
     padding: 6px 14px;
@@ -217,7 +229,18 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .btn-small:hover { border-color: #9b59b6; color: #9b59b6; }
+  .btn-small:hover { border-color: #4dabf7; color: #4dabf7; }
+
+  .btn-enhance {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+  }
+  .btn-enhance:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 20px rgba(155,89,182,0.3); 
+  }
+  .btn-enhance:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
   .thumbnail-section {
     background: #0a0a1a;
@@ -328,8 +351,8 @@
 </head>
 <body>
 <div class="container">
-  <h1>🎬 CINECLIPPER v2.2</h1>
-  <p class="subtitle">Review Film & Drakor dengan Multi-Bahasa</p>
+  <h1>🎬 CINECLIPPER v2.3</h1>
+  <p class="subtitle">Review Film & Drakor dengan AI Enhancement</p>
 
   <!-- STEP 1: INPUT -->
   <div class="card" id="inputCard">
@@ -338,7 +361,8 @@
       <div class="rule-item">🎬 Short (≤1 menit) = <strong>4 klip</strong> × 15 detik</div>
       <div class="rule-item">🎬 5 menit = <strong>7 klip</strong> × ~43 detik</div>
       <div class="rule-item">🎬 10 menit = <strong>12 klip</strong> × ~50 detik</div>
-      <div class="rule-item">🎙️  1 klip = <strong>1 paragraf VO</strong> review alur film (dengan CTA di klip 3 & akhir)</div>
+      <div class="rule-item">🎙️  1 klip = <strong>1 paragraf VO</strong> (dengan CTA di klip 3 & akhir)</div>
+      <div class="rule-item">✨ Klik <strong>Enhance AI</strong> untuk perbaiki narasi via GPT-4o</div>
     </div>
 
     <div class="input-group">
@@ -503,8 +527,6 @@ function displayAnalysis(data) {
   document.getElementById('resClipCount').textContent = data.clipCount + ' KLIP';
   document.getElementById('resClipDuration').textContent = data.clipDuration + ' DETIK';
   document.getElementById('resLang').textContent = data.language.name;
-
-  // Update judul di info grid pertama
   document.querySelector('.info-item:first-child .value').textContent = data.title;
 
   const container = document.getElementById('clipsContainer');
@@ -518,7 +540,6 @@ function displayAnalysis(data) {
     if (isLast) cardClass += ' cta-end';
 
     const ctaBadge = (isClip3 || isLast) ? '<span class="clip-badge badge-cta">CTA</span>' : '';
-    const ctaLabel = isClip3 ? 'CTA SUBSCRIBE' : isLast ? 'CTA AKHIR' : '';
 
     container.innerHTML += `
       <div class="${cardClass}">
@@ -526,21 +547,27 @@ function displayAnalysis(data) {
           <span class="clip-number">KLIP ${narr.clipIndex}</span>
           <div class="clip-meta">
             ${ctaBadge}
+            <span id="badge-ai-${idx}"></span>
             <span class="clip-badge badge-durasi">⏱️ ${narr.durationSec} DETIK</span>
             <span class="clip-badge badge-vo">🎙️ ${narr.estimatedVO}</span>
             <span class="clip-badge badge-time">${narr.start} → ${narr.end}</span>
           </div>
         </div>
-        <div class="clip-narration">${narr.text}</div>
+        <div class="clip-narration" id="narr-text-${idx}">${narr.text}</div>
+
+        <div class="enhanced-result" id="enhanced-${idx}">
+          <div class="enhanced-label">✨ Hasil AI (GPT-4o):</div>
+          <div class="clip-narration enhanced-text" id="enhanced-text-${idx}"></div>
+        </div>
+
         <div class="clip-actions">
           <button class="btn-small" onclick="copyNarration(${idx})">📋 Copy VO</button>
-          <button class="btn-small" onclick="copyGPTPrompt(${idx})">🤖 Copy GPT Prompt</button>
+          <button class="btn-small btn-enhance" id="btn-enhance-${idx}" onclick="enhanceNarration(${idx})">✨ Enhance AI</button>
         </div>
       </div>
     `;
   });
 
-  // Store narration for copy functions
   window.currentNarration = data.narration;
 
   document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
@@ -558,11 +585,48 @@ function copyNarration(idx) {
   });
 }
 
-function copyGPTPrompt(idx) {
-  const prompt = window.currentNarration[idx].gptPrompt;
-  navigator.clipboard.writeText(prompt).then(() => {
-    alert('✅ GPT Prompt disalin! Paste ke ChatGPT untuk enhance narasi.');
-  });
+async function enhanceNarration(idx) {
+    const narr = window.currentNarration[idx];
+    const btn = document.getElementById(`btn-enhance-${idx}`);
+    const resultDiv = document.getElementById(`enhanced-${idx}`);
+    const enhancedTextDiv = document.getElementById(`enhanced-text-${idx}`);
+    const originalTextDiv = document.getElementById(`narr-text-${idx}`);
+
+    btn.disabled = true;
+    btn.innerHTML = '⏳ AI Memproses...';
+
+    try {
+        const res = await fetch(`${API_URL}/api/enhance-narration`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: narr.text,
+                title: currentAnalysis.title,
+                genre: currentAnalysis.genre,
+                lang: document.getElementById('language').value,
+                durationSec: narr.durationSec
+            })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        resultDiv.style.display = 'block';
+        enhancedTextDiv.textContent = data.enhanced;
+
+        window.currentNarration[idx].text = data.enhanced;
+        window.currentNarration[idx].isEnhanced = true;
+
+        const badgeContainer = document.getElementById(`badge-ai-${idx}`);
+        badgeContainer.innerHTML = '<span class="ai-badge">✨ AI</span>';
+
+        btn.innerHTML = '✅ Enhanced';
+
+    } catch (err) {
+        alert('❌ Gagal enhance: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '✨ Enhance AI';
+    }
 }
 
 async function renderVideo() {
