@@ -1,5 +1,5 @@
 
-# Let me create the fixed HTML file
+# Create the complete fixed HTML file with Hybrid Approach
 fixed_html = '''<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -135,7 +135,6 @@ fixed_html = '''<!DOCTYPE html>
     font-weight: 600;
   }
 
-  /* === KLIP CARD === */
   .clip-card {
     background: #0a0a1a;
     border-radius: 14px;
@@ -196,7 +195,6 @@ fixed_html = '''<!DOCTYPE html>
   .clip-card.cta-clip .clip-narration { border-left-color: #e74c3c; }
   .clip-card.cta-end .clip-narration { border-left-color: #feca57; }
 
-  /* === AI ENHANCE RESULT === */
   .enhanced-result {
     margin-top: 12px;
     padding: 14px;
@@ -243,6 +241,16 @@ fixed_html = '''<!DOCTYPE html>
     box-shadow: 0 8px 20px rgba(155,89,182,0.3); 
   }
   .btn-enhance:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-download-mp4 {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white !important;
+    border: none !important;
+  }
+  .btn-download-mp4:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
   .thumbnail-section {
     background: #0a0a1a;
@@ -343,71 +351,36 @@ fixed_html = '''<!DOCTYPE html>
   .rules-box strong { color: #feca57; }
   .rules-box .rule-item { margin-bottom: 4px; }
 
-  /* === CLIP PREVIEW === */
-  .clip-preview {
-    margin-top: 14px;
+  .clip-video-container {
+    margin-bottom: 12px;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #2a2a4a;
     background: #0a0a1a;
+    border: 1px solid #1e1e3a;
   }
 
-  .video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-  }
-
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  .clip-controls {
+  .clip-cutting-status {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
     gap: 10px;
-    padding: 12px;
-    background: #0f0f20;
+    color: #8888aa;
+    font-size: 14px;
   }
 
-  .btn-play, .btn-download {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    font-size: 0.85rem;
+  .cut-progress {
+    color: #feca57;
     font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-size: 16px;
   }
 
-  .btn-play {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
+  .clip-video-container video {
+    width: 100%;
+    display: block;
   }
 
-  .btn-download {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-  }
-
-  .btn-play:hover, .btn-download:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-  }
-
-  .btn-play:disabled, .btn-download:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* === YOUTUBE PREVIEW CARD - PRO === */
   #youtube-preview-container { margin: 16px 0; }
 
   .yt-preview-skeleton {
@@ -436,6 +409,19 @@ fixed_html = '''<!DOCTYPE html>
   .yt-channel-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
   .yt-channel-name { color: #8888aa; font-weight: 600; font-size: 13px; }
   .yt-meta { display: flex; gap: 10px; color: #666; font-size: 12px; margin-bottom: 12px; }
+  .yt-format-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .yt-format-tag {
+    background: #0f0f20;
+    color: #8888aa;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
   .yt-btn-analyze { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
   .yt-btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
 
@@ -454,7 +440,6 @@ fixed_html = '''<!DOCTYPE html>
   <h1>🎬 CINECLIPPER v2.3</h1>
   <p class="subtitle">Review Film & Drakor dengan AI Enhancement</p>
 
-  <!-- STEP 1: INPUT -->
   <div class="card" id="inputCard">
     <div class="rules-box">
       <div class="rule-item">📋 <strong>RULES KLIP:</strong></div>
@@ -511,7 +496,6 @@ fixed_html = '''<!DOCTYPE html>
     <div id="errorMsg"></div>
   </div>
 
-  <!-- STEP 2: ANALYSIS RESULT -->
   <div class="card analysis-result" id="analysisResult">
     <div class="result-header">
       <span class="icon">✅</span>
@@ -580,35 +564,36 @@ fixed_html = '''<!DOCTYPE html>
 <script>
 const API_URL = 'http://localhost:3000';
 let currentAnalysis = null;
+let currentJobId = null;
 
-/* === YOUTUBE PREVIEW CARD - PRO === */
+/* === YOUTUBE PREVIEW CARD - OPSI B (THUMBNAIL ONLY) === */
 class YouTubePreviewCard {
-  constructor(containerId, options = {}) {
+  constructor(containerId, options) {
     this.container = document.getElementById(containerId);
     this.apiBaseUrl = options.apiBaseUrl || 'http://localhost:3000';
-    this.onAnalyze = options.onAnalyze || (() => {});
+    this.onAnalyze = options.onAnalyze || function(){};
     this.currentData = null;
     this.init();
   }
   init() {
     if (!this.container) {
-      console.error('[YouTubePreview] Container #youtube-preview-container tidak ditemukan!');
+      console.error('[YouTubePreview] Container tidak ditemukan!');
       return;
     }
     this.container.innerHTML = '';
   }
   showLoading() {
     if (!this.container) return;
-    this.container.innerHTML = `<div class="yt-preview-skeleton"><div class="yt-skeleton-thumb"></div><div class="yt-skeleton-info"><div class="yt-skeleton-title"></div><div class="yt-skeleton-meta"></div></div></div>`;
+    this.container.innerHTML = '<div class="yt-preview-skeleton"><div class="yt-skeleton-thumb"></div><div class="yt-skeleton-info"><div class="yt-skeleton-title"></div><div class="yt-skeleton-meta"></div></div></div>';
   }
   showError(message) {
     if (!this.container) return;
-    this.container.innerHTML = `<div class="yt-preview-error"><div>⚠️ ${message}</div></div>`;
+    this.container.innerHTML = '<div class="yt-preview-error"><div>⚠️ ' + message + '</div></div>';
   }
   async loadVideo(url) {
     this.showLoading();
     try {
-      const res = await fetch(`${this.apiBaseUrl}/api/youtube-info?url=${encodeURIComponent(url)}`);
+      const res = await fetch(this.apiBaseUrl + '/api/youtube-info?url=' + encodeURIComponent(url));
       const result = await res.json();
       if (!result.success) throw new Error(result.error);
       this.currentData = result.data;
@@ -617,28 +602,7 @@ class YouTubePreviewCard {
   }
   renderCard(data) {
     if (!this.container) return;
-    this.container.innerHTML = `
-      <div class="yt-preview-card">
-        <div class="yt-card">
-          <div class="yt-thumbnail-wrap">
-            <img src="${data.thumbnail}" alt="${data.title}" class="yt-thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/480x360?text=No+Thumbnail'">
-            <span class="yt-duration">${data.duration}</span>
-          </div>
-          <div class="yt-info">
-            <h3 class="yt-title">${this.escapeHtml(data.title)}</h3>
-            <div class="yt-channel">
-              <div class="yt-channel-avatar">${data.channelName.charAt(0)}</div>
-              <div class="yt-channel-name">${this.escapeHtml(data.channelName)}</div>
-            </div>
-            <div class="yt-meta">
-              <span>👁 ${data.views} views</span>
-              <span>•</span>
-              <span>${data.publishedAt}</span>
-            </div>
-            <button class="yt-btn-analyze" onclick="previewCard.analyze()">🔍 Analisis Video Ini</button>
-          </div>
-        </div>
-      </div>`;
+    this.container.innerHTML = '<div class="yt-preview-card"><div class="yt-card"><div class="yt-thumbnail-wrap"><img src="' + data.thumbnail + '" alt="' + data.title + '" class="yt-thumbnail" loading="lazy" onerror="this.src=\'https://via.placeholder.com/480x360?text=No+Thumbnail\'"><span class="yt-duration">' + data.duration + '</span></div><div class="yt-info"><h3 class="yt-title">' + this.escapeHtml(data.title) + '</h3><div class="yt-channel"><div class="yt-channel-avatar">' + data.channelName.charAt(0) + '</div><div class="yt-channel-name">' + this.escapeHtml(data.channelName) + '</div></div><div class="yt-meta"><span>👁 ' + data.views + ' views</span><span>•</span><span>' + data.publishedAt + '</span></div><div class="yt-format-preview"><span class="yt-format-tag">📱 Short: 4 klip × 15 detik</span><span class="yt-format-tag">🎬 Medium: 7 klip × ~43 detik</span><span class="yt-format-tag">🍿 Long: 12 klip × ~50 detik</span></div><button class="yt-btn-analyze" onclick="previewCard.analyze()">🔍 Analisis Video Ini</button></div></div></div>';
   }
   escapeHtml(text) {
     const div = document.createElement('div');
@@ -647,7 +611,7 @@ class YouTubePreviewCard {
   }
   analyze() {
     if (this.currentData) {
-      document.getElementById('videoUrl').value = `https://youtube.com/watch?v=${this.currentData.id}`;
+      document.getElementById('videoUrl').value = 'https://youtube.com/watch?v=' + this.currentData.id;
       this.onAnalyze(this.currentData);
     }
   }
@@ -661,21 +625,20 @@ class YouTubePreviewCard {
 
 const previewCard = new YouTubePreviewCard('youtube-preview-container', {
   apiBaseUrl: API_URL,
-  onAnalyze: (videoData) => { console.log('Ready:', videoData); }
+  onAnalyze: function(videoData) { console.log('Ready:', videoData); }
 });
 
-// Auto-load preview saat user ketik/paste URL (debounce 600ms)
 let ytDebounceTimer;
-document.getElementById('videoUrl').addEventListener('input', (e) => {
+document.getElementById('videoUrl').addEventListener('input', function(e) {
   const url = e.target.value.trim();
   clearTimeout(ytDebounceTimer);
   if (!url) { previewCard.clear(); return; }
   if (!/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)/.test(url)) return;
-  ytDebounceTimer = setTimeout(() => previewCard.loadVideo(url), 600);
+  ytDebounceTimer = setTimeout(function() { previewCard.loadVideo(url); }, 600);
 });
 
 function showError(msg) {
-  document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
+  document.getElementById('errorMsg').innerHTML = '<div class="error-msg">❌ ' + msg + '</div>';
 }
 function clearError() {
   document.getElementById('errorMsg').innerHTML = '';
@@ -695,18 +658,23 @@ async function analyzeVideo() {
   btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:8px;"></div> Menganalisis...';
 
   try {
-    const res = await fetch(`${API_URL}/api/analyze`, {
+    const res = await fetch(API_URL + '/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, lang, format })
+      body: JSON.stringify({ url: url, lang: lang, format: format })
     });
 
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
     currentAnalysis = data;
-    currentAnalysis.format = format; 
+    currentAnalysis.format = format;
+    currentJobId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    
     displayAnalysis(data);
+    
+    // Start background cutting immediately
+    startBackgroundCut(currentJobId, url, data.clips);
 
   } catch (err) {
     showError('Gagal analisis: ' + err.message);
@@ -716,76 +684,84 @@ async function analyzeVideo() {
   }
 }
 
-function extractVideoId(url) {
-  if (url.includes('youtube.com/watch?v=')) {
-    return url.split('v=')[1].split('&')[0];
-  } else if (url.includes('youtu.be/')) {
-    return url.split('youtu.be/')[1].split('?')[0];
-  }
-  return '';
-}
-
-function timeToSeconds(timeStr) {
-  const parts = timeStr.split(':').map(Number);
-  if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
-  return parts[0]*60 + parts[1];
-}
-
-function loadVideoPreviews() {
-  const videoId = extractVideoId(currentAnalysis.url);
-  if (!videoId) return;
-  
-  currentAnalysis.clips.forEach((clip, idx) => {
-    const iframe = document.getElementById(`video-${idx}`);
-    if (iframe) {
-      const startSec = timeToSeconds(clip.start);
-      const endSec = timeToSeconds(clip.end);
-      iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startSec}&end=${endSec}&autoplay=0&rel=0`;
-    }
+function startBackgroundCut(jobId, url, clips) {
+  fetch(API_URL + '/api/start-cut', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jobId: jobId, url: url, clips: clips })
+  }).catch(function(err) {
+    console.error('Failed to start cutting:', err);
   });
+  
+  // Start polling
+  pollCutStatus(jobId, clips.length);
 }
 
-function playClip(idx) {
-  const iframe = document.getElementById(`video-${idx}`);
-  const currentSrc = iframe.src;
-  iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
-  document.getElementById(`btn-play-${idx}`).innerHTML = '⏸️ Playing...';
+function pollCutStatus(jobId, totalClips) {
+  const pollInterval = setInterval(async function() {
+    try {
+      const res = await fetch(API_URL + '/api/cut-status/' + jobId);
+      const result = await res.json();
+      
+      if (!result.success) {
+        clearInterval(pollInterval);
+        return;
+      }
+      
+      const data = result.data;
+      
+      // Update clips yang sudah selesai
+      data.clips.forEach(function(clip) {
+        const idx = clip.index - 1;
+        updateClipReady(idx, clip.url, clip.duration);
+      });
+      
+      // Update progress text untuk yang masih cutting
+      if (data.status === 'downloading') {
+        document.querySelectorAll('.cut-progress').forEach(function(el) {
+          el.textContent = 'Downloading video...';
+        });
+      } else if (data.status === 'cutting') {
+        document.querySelectorAll('.cut-progress').forEach(function(el) {
+          el.textContent = 'Cutting... ' + data.progress + '%';
+        });
+      }
+      
+      // Stop polling kalau selesai atau error
+      if (data.status === 'completed' || data.status === 'error') {
+        clearInterval(pollInterval);
+        
+        if (data.status === 'completed') {
+          document.querySelectorAll('.clip-cutting-status').forEach(function(el) {
+            el.style.display = 'none';
+          });
+          document.querySelectorAll('.btn-download-mp4').forEach(function(btn) {
+            btn.style.display = 'inline-block';
+            btn.disabled = false;
+          });
+        }
+      }
+      
+    } catch (err) {
+      console.error('Poll error:', err);
+    }
+  }, 2000);
 }
 
-async function downloadClip(idx) {
-  const clip = currentAnalysis.clips[idx];
-  const btn = document.getElementById(`btn-download-${idx}`);
+function updateClipReady(idx, videoUrl, duration) {
+  const statusEl = document.getElementById('cut-status-' + idx);
+  const videoEl = document.getElementById('video-' + idx);
+  const downloadBtn = document.getElementById('btn-download-' + idx);
   
-  btn.disabled = true;
-  btn.innerHTML = '⏳ Processing...';
-  
-  try {
-    const res = await fetch(`${API_URL}/api/render-single`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: currentAnalysis.url,
-        clip: clip,
-        isShort: currentAnalysis.isShort
-      })
-    });
-    
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error);
-    
-    const a = document.createElement('a');
-    a.href = data.videoUrl;
-    a.download = data.filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    
-    btn.innerHTML = '✅ Downloaded';
-    
-  } catch (err) {
-    alert('❌ Gagal download: ' + err.message);
-    btn.disabled = false;
-    btn.innerHTML = '⬇️ Download Cut';
+  if (statusEl) statusEl.style.display = 'none';
+  if (videoEl) {
+    videoEl.style.display = 'block';
+    videoEl.src = videoUrl;
+    videoEl.load();
+  }
+  if (downloadBtn) {
+    downloadBtn.style.display = 'inline-block';
+    downloadBtn.disabled = false;
   }
 }
 
@@ -800,7 +776,7 @@ function displayAnalysis(data) {
   const container = document.getElementById('clipsContainer');
   container.innerHTML = '';
 
-  data.narration.forEach((narr, idx) => {
+  data.narration.forEach(function(narr, idx) {
     const isClip3 = idx === 2;
     const isLast = idx === data.narration.length - 1;
     let cardClass = 'clip-card';
@@ -809,78 +785,37 @@ function displayAnalysis(data) {
     
     const ctaBadge = (isClip3 || isLast) ? '<span class="clip-badge badge-cta">CTA</span>' : '';
     
-    container.innerHTML += `
-      <div class="${cardClass}">
-        <div class="clip-header">
-          <span class="clip-number">KLIP ${narr.clipIndex}</span>
-          <div class="clip-meta">
-            ${ctaBadge}
-            <span id="badge-ai-${idx}"></span>
-            <span class="clip-badge badge-durasi">⏱️ ${narr.durationSec} DETIK</span>
-            <span class="clip-badge badge-vo">🎙️ ${narr.estimatedVO}</span>
-            <span class="clip-badge badge-time">${narr.start} → ${narr.end}</span>
-          </div>
-        </div>
-        
-        <div class="clip-preview">
-          <div class="video-wrapper">
-            <iframe id="video-${idx}" 
-                    src="" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
-          </div>
-          <div class="clip-controls">
-            <button class="btn-play" id="btn-play-${idx}" onclick="playClip(${idx})">▶️ Play</button>
-            <button class="btn-download" id="btn-download-${idx}" onclick="downloadClip(${idx})">⬇️ Download Cut</button>
-          </div>
-        </div>
-        
-        <div class="clip-narration" id="narr-text-${idx}">${narr.text}</div>
-        
-        <div class="enhanced-result" id="enhanced-${idx}">
-          <div class="enhanced-label">✨ Hasil AI (GPT-4o):</div>
-          <div class="clip-narration enhanced-text" id="enhanced-text-${idx}"></div>
-        </div>
-        
-        <div class="clip-actions">
-          <button class="btn-small" onclick="copyNarration(${idx})">📋 Copy VO</button>
-          <button class="btn-small btn-enhance" id="btn-enhance-${idx}" onclick="enhanceNarration(${idx})">✨ Enhance AI</button>
-        </div>
-      </div>
-    `;
+    container.innerHTML += '<div class="' + cardClass + '" id="clip-card-' + idx + '"><div class="clip-header"><span class="clip-number">KLIP ' + narr.clipIndex + '</span><div class="clip-meta">' + ctaBadge + '<span id="badge-ai-' + idx + '"></span><span class="clip-badge badge-durasi">⏱️ ' + narr.durationSec + ' DETIK</span><span class="clip-badge badge-vo">🎙️ ' + narr.estimatedVO + '</span><span class="clip-badge badge-time">' + narr.start + ' → ' + narr.end + '</span></div></div><div class="clip-video-container" id="video-container-' + idx + '"><div class="clip-cutting-status" id="cut-status-' + idx + '"><div class="spinner" style="width:30px;height:30px;"></div><span>⏳ Sedang memotong klip...</span><span class="cut-progress" id="cut-progress-' + idx + '">0%</span></div><video id="video-' + idx + '" controls style="display:none;" preload="metadata"><source src="" type="video/mp4"></video></div><div class="clip-narration" id="narr-text-' + idx + '">' + narr.text + '</div><div class="enhanced-result" id="enhanced-' + idx + '"><div class="enhanced-label">✨ Hasil AI (GPT-4o):</div><div class="clip-narration enhanced-text" id="enhanced-text-' + idx + '"></div></div><div class="clip-actions"><button class="btn-small" onclick="copyNarration(' + idx + ')">📋 Copy VO</button><button class="btn-small btn-enhance" id="btn-enhance-' + idx + '" onclick="enhanceNarration(' + idx + ')">✨ Enhance AI</button><button class="btn-small btn-download-mp4" id="btn-download-' + idx + '" onclick="downloadClip(' + idx + ')" disabled style="display:none;">⬇️ Download MP4</button></div></div>';
   });
 
   window.currentNarration = data.narration;
 
   document.getElementById('thumbnailPrompt').textContent = data.thumbnail.prompt;
   const toolsContainer = document.getElementById('thumbnailTools');
-  toolsContainer.innerHTML = data.thumbnail.tools.map(t => `<span class="tool-badge">${t}</span>`).join('');
+  toolsContainer.innerHTML = data.thumbnail.tools.map(function(t) { return '<span class="tool-badge">' + t + '</span>'; }).join('');
 
   document.getElementById('analysisResult').classList.add('show');
-  loadVideoPreviews();
   document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth' });
 }
 
 function copyNarration(idx) {
   const text = window.currentNarration[idx].text;
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(text).then(function() {
     alert('✅ Narasi VO disalin ke clipboard!');
   });
 }
 
 async function enhanceNarration(idx) {
   const narr = window.currentNarration[idx];
-  const btn = document.getElementById(`btn-enhance-${idx}`);
-  const resultDiv = document.getElementById(`enhanced-${idx}`);
-  const enhancedTextDiv = document.getElementById(`enhanced-text-${idx}`);
+  const btn = document.getElementById('btn-enhance-' + idx);
+  const resultDiv = document.getElementById('enhanced-' + idx);
+  const enhancedTextDiv = document.getElementById('enhanced-text-' + idx);
 
   btn.disabled = true;
   btn.innerHTML = '⏳ AI Memproses...';
 
   try {
-    const res = await fetch(`${API_URL}/api/enhance-narration`, {
+    const res = await fetch(API_URL + '/api/enhance-narration', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -901,7 +836,7 @@ async function enhanceNarration(idx) {
     window.currentNarration[idx].text = data.enhanced;
     window.currentNarration[idx].isEnhanced = true;
 
-    const badgeContainer = document.getElementById(`badge-ai-${idx}`);
+    const badgeContainer = document.getElementById('badge-ai-' + idx);
     badgeContainer.innerHTML = '<span class="ai-badge">✨ AI</span>';
 
     btn.innerHTML = '✅ Enhanced';
@@ -911,6 +846,17 @@ async function enhanceNarration(idx) {
     btn.disabled = false;
     btn.innerHTML = '✨ Enhance AI';
   }
+}
+
+function downloadClip(idx) {
+  if (!currentJobId) return;
+  
+  const a = document.createElement('a');
+  a.href = API_URL + '/api/download-clip/' + currentJobId + '/' + (idx + 1);
+  a.download = 'clip_' + (idx + 1) + '.mp4';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 async function renderAllClips() {
@@ -926,7 +872,7 @@ async function renderAllClips() {
   result.classList.remove('show');
 
   try {
-    const res = await fetch(`${API_URL}/api/render`, {
+    const res = await fetch(API_URL + '/api/render', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -952,7 +898,7 @@ async function renderAllClips() {
     btn.innerHTML = '🔄 RENDER ULANG';
 
   } catch (err) {
-    status.innerHTML = `<div class="error-msg">❌ Gagal render: ${err.message}</div>`;
+    status.innerHTML = '<div class="error-msg">❌ Gagal render: ' + err.message + '</div>';
     btn.style.display = 'block';
     btn.disabled = false;
   }
@@ -960,3 +906,14 @@ async function renderAllClips() {
 </script>
 </body>
 </html>'''
+
+with open('/mnt/agents/output/index-hybrid.html', 'w', encoding='utf-8') as f:
+    f.write(fixed_html)
+
+# Verify
+with open('/mnt/agents/output/index-hybrid.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+print("File saved:", len(content), "chars")
+print("Ends with:", content[-30:])
+print("Contains Python:", 'Save to file' in content or 'ipython' in content)
