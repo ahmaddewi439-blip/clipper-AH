@@ -394,10 +394,11 @@
       </div>
 
       <div class="input-group">
-        <label>📐 Format Output</label>
+        <label>📐 Format Output (Penentu Durasi VO)</label>
         <select id="format">
-          <option value="long">🎬 YouTube Long (16:9)</option>
-          <option value="short">📱 YouTube Shorts (9:16)</option>
+          <option value="short">📱 Shorts 1 Menit (4 Klip x 15 dtk)</option>
+          <option value="medium">🎬 Long 5 Menit (7 Klip x ~43 dtk)</option>
+          <option value="long">🍿 Long 10 Menit (12 Klip x ~50 dtk)</option>
         </select>
       </div>
     </div>
@@ -489,8 +490,7 @@ function clearError() {
 async function analyzeVideo() {
   const url = document.getElementById('videoUrl').value.trim();
   const lang = document.getElementById('language').value;
-  const format = document.getElementById('format').value;
-  const isShort = format === 'short';
+  const format = document.getElementById('format').value; // Mengambil nilai short/medium/long
 
   if (!url) { showError('Masukkan URL YouTube terlebih dahulu!'); return; }
   if (!url.includes('youtube.com') && !url.includes('youtu.be')) { showError('URL harus dari YouTube!'); return; }
@@ -504,13 +504,16 @@ async function analyzeVideo() {
     const res = await fetch(`${API_URL}/api/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, lang, isShort })
+      body: JSON.stringify({ url, lang, format }) // Mengirimkan "format" ke server
     });
 
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
     currentAnalysis = data;
+    // Menyimpan format agar bisa dipakai saat render nanti
+    currentAnalysis.format = format; 
+    
     displayAnalysis(data);
 
   } catch (err) {
@@ -648,7 +651,8 @@ async function renderVideo() {
       body: JSON.stringify({
         url: currentAnalysis.url,
         clips: currentAnalysis.clips,
-        isShort: currentAnalysis.isShort
+        format: currentAnalysis.format, // Mengirim format saat render
+        isShort: currentAnalysis.format === 'short' // Penentu ukuran rasio video 9:16 atau 16:9
       })
     });
 
