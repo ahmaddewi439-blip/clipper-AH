@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="16" fill="#16161f"/>
+  <rect x="20" y="20" width="8" height="56" rx="4" fill="#e8441a"/>
+  <rect x="32" y="32" width="8" height="40" rx="4" fill="#e8441a" opacity="0.6"/>
+  <rect x="44" y="44" width="8" height="28" rx="4" fill="#e8441a" opacity="0.35"/>
+  <text x="60" y="82" font-family="Arial Black, sans-serif" font-size="34" font-weight="900" fill="#e8e8f0" letter-spacing="4">CINE</text>
+  <text x="60" y="82" font-family="Arial Black, sans-serif" font-size="34" font-weight="900" fill="#e8441a" letter-spacing="4" x="155">CLIP</text>
+  <text x="100" y="110" font-family="Arial, sans-serif" font-size="11" fill="#6b6b88" text-anchor="middle" letter-spacing="3">AI MOVIE ANALYZER</text>
+  <rect x="40" y="130" width="120" height="40" rx="8" fill="#e8441a" opacity="0.12"/>
+  <text x="100" y="155" font-family="Arial, sans-serif" font-size="10" fill="#ff7c42" text-anchor="middle" letter-spacing="2">POWERED BY CLAUDE</text>
+</svg>
