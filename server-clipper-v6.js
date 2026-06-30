@@ -8,7 +8,11 @@ const axios = require('axios');
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://clipper-ah-production.up.railway.app', 'https://cineclipper.up.railway.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use('/output', express.static('output'));
 
