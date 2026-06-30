@@ -261,8 +261,8 @@ app.get('/api/youtube-info', async (req, res) => {
     res.status(500).json({ success: false, error: 'Gagal ambil data YouTube' });
   }
 });
-const FFMPEG_PATH = "C:\\Users\\User\\ffmpeg\\bin\\ffmpeg.exe";
-const YTDLP_PATH = "C:\\Program Files\\nodejs\\yt-dlp.exe";
+const FFMPEG_PATH = 'ffmpeg';  // Railway sudah install ffmpeg via apt
+const YTDLP_PATH = 'yt-dlp';   // Nanti kita install yt-dlp via pip
 
 // Konfigurasi Koboi LLM - PASTIKAN API KEY SUDAH BENAR
 const KOBOI_API_KEY = 'sk-S1w-OnAhdjtzMyYVMlYvGw';  // GANTI JIKA PERLU
