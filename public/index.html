@@ -803,6 +803,23 @@ function copyNarration(idx) {
   });
 }
 
+function downloadClip(idx) {
+  const videoEl = document.getElementById('video-' + idx);
+  const videoUrl = videoEl.src;
+  
+  if (!videoUrl) {
+    alert('Video belum siap!');
+    return;
+  }
+  
+  const a = document.createElement('a');
+  a.href = videoUrl;
+  a.download = 'Klip_' + (idx + 1) + '.mp4';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 async function enhanceNarration(idx) {
   const narr = window.currentNarration[idx];
   const btn = document.getElementById('btn-enhance-' + idx);
