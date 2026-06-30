@@ -729,7 +729,7 @@ app.post('/api/render', async (req, res) => {
 
     res.json({
       success: true,
-      videoUrl: `http://localhost:3000/output/Klip_${ts}.mp4`,
+      videoUrl: `/output/Klip_${ts}.mp4`,
       filename: `Klip_${ts}.mp4`,
       message: "Render selesai!"
     });
@@ -789,7 +789,7 @@ app.post('/api/render-single', async (req, res) => {
         
         res.json({
             success: true,
-            videoUrl: `http://localhost:3000/output/Klip_${ts}_${clip.index}.mp4`,
+            videoUrl: `/output/Klip_${ts}_${clip.index}.mp4`,
             filename: `Klip_${ts}_${clip.index}.mp4`
         });
         
