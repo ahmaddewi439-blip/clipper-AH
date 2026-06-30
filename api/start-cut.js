@@ -8,10 +8,8 @@ module.exports = async (req, res) => {
 
   const { jobId, url, clips } = req.body;
   
-  // Extract video ID
   const videoId = extractYouTubeId(url);
   
-  // Generate embed URLs untuk setiap klip
   const embedClips = clips.map((clip, i) => ({
     index: i + 1,
     url: `https://www.youtube.com/embed/${videoId}?start=${clip.startSec}&end=${clip.endSec}&autoplay=0&rel=0&modestbranding=1`,
