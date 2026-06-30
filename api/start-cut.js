@@ -8,25 +8,29 @@ module.exports = async (req, res) => {
 
   const { jobId, url, clips } = req.body;
   
-  // Simpan job di memory (Vercel: hanya persist 1 request)
-  // Solusi: Gunakan Cloudinary atau return langsung embed URL
+  // Extract video ID
+  const videoId = extractYouTubeId(url);
   
-  // Karena Vercel tidak bisa background process, kita return langsung
-  const embedClips = clips.map((clip, i) => {
-    const videoId = extractYouTubeId(url);
-    return {
-      index: i + 1,
-      url: `https://www.youtube.com/embed/${videoId}?start=${clip.startSec}&end=${clip.endSec}&autoplay=0&rel=0`,
-      start: clip.start,
-      end: clip.end,
-      duration: clip.durationSec
-    };
-  });
+  // Generate embed URLs untuk setiap klip
+  const embedClips = clips.map((clip, i) => ({
+    index: i + 1,
+    url: `https://www.youtube.com/embed/${videoId}?start=${clip.startSec}&end=${clip.endSec}&autoplay=0&rel=0&modestbranding=1`,
+    thumbnailUrl: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+    start: clip.start,
+    end: clip.end,
+    startSec: clip.startSec,
+    endSec: clip.endSec,
+    duration: clip.durationSec,
+    status: 'ready'
+  }));
 
   res.json({
     success: true,
     jobId,
     status: 'completed',
+    progress: 100,
+    completed: clips.length,
+    total: clips.length,
     clips: embedClips
   });
 };
