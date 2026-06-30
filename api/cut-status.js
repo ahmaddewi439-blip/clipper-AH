@@ -8,8 +8,8 @@ module.exports = async (req, res) => {
 
   const { jobId } = req.query;
   
-  // Karena Vercel tidak bisa persist state, kita return completed langsung
-  // (Frontend sudah dapat data dari start-cut)
+  // Karena tidak ada state persistence, return completed
+  // Frontend sudah handle via start-cut response
   res.json({
     success: true,
     data: {
