@@ -560,7 +560,7 @@
 </div>
 
 <script>
-const API_URL = ''; // nanti ganti dengan URL Railway Anda
+const API_URL = '';
 let currentAnalysis = null;
 let currentJobId = null;
 
@@ -600,7 +600,7 @@ class YouTubePreviewCard {
   }
   renderCard(data) {
     if (!this.container) return;
-    this.container.innerHTML = '<div class="yt-preview-card"><div class="yt-card"><div class="yt-thumbnail-wrap"><img src="' + data.thumbnail + '" alt="' + data.title + '" class="yt-thumbnail" loading="lazy" onerror="this.src=\'https://via.placeholder.com/480x360?text=No+Thumbnail\'"><span class="yt-duration">' + data.duration + '</span></div><div class="yt-info"><h3 class="yt-title">' + this.escapeHtml(data.title) + '</h3><div class="yt-channel"><div class="yt-channel-avatar">' + data.channelName.charAt(0) + '</div><div class="yt-channel-name">' + this.escapeHtml(data.channelName) + '</div></div><div class="yt-meta"><span>👁 ' + data.views + ' views</span><span>•</span><span>' + data.publishedAt + '</span></div><div class="yt-format-preview"><span class="yt-format-tag">📱 Short: 4 klip × 15 detik</span><span class="yt-format-tag">🎬 Medium: 7 klip × ~43 detik</span><span class="yt-format-tag">🍿 Long: 12 klip × ~50 detik</span></div><button class="yt-btn-analyze" onclick="previewCard.analyze()">🔍 Analisis Video Ini</button></div></div></div>';
+    this.container.innerHTML = '<div class="yt-preview-card"><div class="yt-card"><div class="yt-thumbnail-wrap"><img src="' + data.thumbnail + '" alt="' + data.title + '" class="yt-thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/480x360?text=No+Thumbnail'"><span class="yt-duration">' + data.duration + '</span></div><div class="yt-info"><h3 class="yt-title">' + this.escapeHtml(data.title) + '</h3><div class="yt-channel"><div class="yt-channel-avatar">' + data.channelName.charAt(0) + '</div><div class="yt-channel-name">' + this.escapeHtml(data.channelName) + '</div></div><div class="yt-meta"><span>👁 ' + data.views + ' views</span><span>•</span><span>' + data.publishedAt + '</span></div><div class="yt-format-preview"><span class="yt-format-tag">📱 Short: 4 klip × 15 detik</span><span class="yt-format-tag">🎬 Medium: 7 klip × ~43 detik</span><span class="yt-format-tag">🍿 Long: 12 klip × ~50 detik</span></div><button class="yt-btn-analyze" onclick="previewCard.analyze()">🔍 Analisis Video Ini</button></div></div></div>';
   }
   escapeHtml(text) {
     const div = document.createElement('div');
@@ -668,9 +668,9 @@ async function analyzeVideo() {
     currentAnalysis = data;
     currentAnalysis.format = format;
     currentJobId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-    
+
     displayAnalysis(data);
-    
+
     // Start background cutting immediately
     startBackgroundCut(currentJobId, url, data.clips);
 
@@ -690,30 +690,31 @@ function startBackgroundCut(jobId, url, clips) {
   }).catch(function(err) {
     console.error('Failed to start cutting:', err);
   });
-  
-  // Start polling
+
+  // Start polling - FIX: pakai query parameter bukan dynamic route
   pollCutStatus(jobId, clips.length);
 }
 
 function pollCutStatus(jobId, totalClips) {
   const pollInterval = setInterval(async function() {
     try {
-      const res = await fetch(API_URL + '/api/cut-status/' + jobId);
+      // FIX: Ubah dari /api/cut-status/jobId ke /api/cut-status?jobId=xxx
+      const res = await fetch(API_URL + '/api/cut-status?jobId=' + encodeURIComponent(jobId));
       const result = await res.json();
-      
+
       if (!result.success) {
         clearInterval(pollInterval);
         return;
       }
-      
+
       const data = result.data;
-      
+
       // Update clips yang sudah selesai
       data.clips.forEach(function(clip) {
         const idx = clip.index - 1;
         updateClipReady(idx, clip.url, clip.duration);
       });
-      
+
       // Update progress text untuk yang masih cutting
       if (data.status === 'downloading') {
         document.querySelectorAll('.cut-progress').forEach(function(el) {
@@ -724,11 +725,11 @@ function pollCutStatus(jobId, totalClips) {
           el.textContent = 'Cutting... ' + data.progress + '%';
         });
       }
-      
+
       // Stop polling kalau selesai atau error
       if (data.status === 'completed' || data.status === 'error') {
         clearInterval(pollInterval);
-        
+
         if (data.status === 'completed') {
           document.querySelectorAll('.clip-cutting-status').forEach(function(el) {
             el.style.display = 'none';
@@ -739,7 +740,7 @@ function pollCutStatus(jobId, totalClips) {
           });
         }
       }
-      
+
     } catch (err) {
       console.error('Poll error:', err);
     }
@@ -750,16 +751,16 @@ function updateClipReady(idx, videoUrl, duration) {
   const statusEl = document.getElementById('cut-status-' + idx);
   const videoContainer = document.getElementById('video-container-' + idx);
   const downloadBtn = document.getElementById('btn-download-' + idx);
-  
+
   if (statusEl) statusEl.style.display = 'none';
-  
+
   // Ganti video dengan iframe embed
   if (videoContainer) {
     videoContainer.innerHTML = '<iframe width="100%" height="200" src="' + videoUrl + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
   }
-  
+
   if (downloadBtn) {
-    downloadBtn.style.display = 'none'; // Hide download karena tidak bisa generate MP4
+    downloadBtn.style.display = 'none';
   }
 }
 
@@ -780,10 +781,10 @@ function displayAnalysis(data) {
     let cardClass = 'clip-card';
     if (isClip3) cardClass += ' cta-clip';
     if (isLast) cardClass += ' cta-end';
-    
+
     const ctaBadge = (isClip3 || isLast) ? '<span class="clip-badge badge-cta">CTA</span>' : '';
-    
-    container.innerHTML += '<div class="' + cardClass + '" id="clip-card-' + idx + '"><div class="clip-header"><span class="clip-number">KLIP ' + narr.clipIndex + '</span><div class="clip-meta">' + ctaBadge + '<span id="badge-ai-' + idx + '"></span><span class="clip-badge badge-durasi">⏱️ ' + narr.durationSec + ' DETIK</span><span class="clip-badge badge-vo">🎙️ ' + narr.estimatedVO + '</span><span class="clip-badge badge-time">' + narr.start + ' → ' + narr.end + '</span></div></div><div class="clip-video-container" id="video-container-' + idx + '"><div class="clip-cutting-status" id="cut-status-' + idx + '"><div class="spinner" style="width:30px;height:30px;"></div><span>⏳ Sedang memotong klip...</span><span class="cut-progress" id="cut-progress-' + idx + '">0%</span></div><video id="video-' + idx + '" controls style="display:none;" preload="metadata" src=""></video></div><div class="clip-narration" id="narr-text-' + idx + '">' + narr.text + '</div><div class="enhanced-result" id="enhanced-' + idx + '"><div class="enhanced-label">✨ Hasil AI (GPT-4o):</div><div class="clip-narration enhanced-text" id="enhanced-text-' + idx + '"></div></div><div class="clip-actions"><button class="btn-small" onclick="copyNarration(' + idx + ')">📋 Copy VO</button><button class="btn-small btn-enhance" id="btn-enhance-' + idx + '" onclick="enhanceNarration(' + idx + ')">✨ Enhance AI</button><button class="btn-small btn-download-mp4" id="btn-download-' + idx + '" onclick="downloadClip(' + idx + ')" disabled style="display:none;">⬇️ Download MP4</button></div></div>';
+
+    container.innerHTML += '<div class="' + cardClass + '" id="clip-card-' + idx + '"><div class="clip-header"><span class="clip-number">KLIP ' + narr.clipIndex + '</span><div class="clip-meta">' + ctaBadge + '<span id="badge-ai-' + idx + '"></span><span class="clip-badge badge-durasi">⏱️ ' + narr.durationSec + ' DETIK</span><span class="clip-badge badge-vo">🎙️ ' + narr.estimatedVO + '</span><span class="clip-badge badge-time">' + narr.start + ' → ' + narr.end + '</span></div></div><div class="clip-video-container" id="video-container-' + idx + '"><div class="clip-cutting-status" id="cut-status-' + idx + '"><div class="spinner" style="width:30px;height:30px;"></div><span>⏳ Sedang memotong klip...</span><span class="cut-progress" id="cut-progress-' + idx + '">0%</span></div></div><div class="clip-narration" id="narr-text-' + idx + '">' + narr.text + '</div><div class="enhanced-result" id="enhanced-' + idx + '"><div class="enhanced-label">✨ Hasil AI (GPT-4o):</div><div class="clip-narration enhanced-text" id="enhanced-text-' + idx + '"></div></div><div class="clip-actions"><button class="btn-small" onclick="copyNarration(' + idx + ')">📋 Copy VO</button><button class="btn-small btn-enhance" id="btn-enhance-' + idx + '" onclick="enhanceNarration(' + idx + ')">✨ Enhance AI</button></div></div>';
   });
 
   window.currentNarration = data.narration;
@@ -844,17 +845,6 @@ async function enhanceNarration(idx) {
     btn.disabled = false;
     btn.innerHTML = '✨ Enhance AI';
   }
-}
-
-function downloadClip(idx) {
-  if (!currentJobId) return;
-  
-  const a = document.createElement('a');
-  a.href = API_URL + '/api/download-clip/' + currentJobId + '/' + (idx + 1);
-  a.download = 'clip_' + (idx + 1) + '.mp4';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
 }
 
 async function renderAllClips() {
