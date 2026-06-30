@@ -65,7 +65,7 @@ app.post('/api/start-cut', async (req, res) => {
 
 function getStreamUrl(url) {
     try {
-        const cmd = `"${YTDLP_PATH}" --no-check-certificate --extractor-args "youtube:player_client=android,web" -f "best[ext=mp4]/best" --get-url "${url}"`;
+        const cmd = `"${YTDLP_PATH}" --no-check-certificate -f "best[ext=mp4]/best" --get-url "${url}"`;
         return execSync(cmd, { encoding: 'utf-8', timeout: 30000 }).trim();
     } catch (e) {
         const cmd2 = `"${YTDLP_PATH}" --no-check-certificate --cookies-from-browser chrome -f "best[ext=mp4]/best" --get-url "${url}"`;
@@ -103,7 +103,7 @@ async function startBackgroundCut(jobId, url, clips) {
             console.log(`[CUT ${jobId}] ⚡ Menyedot Klip ${i + 1}: dari detik ${startSec} sampai ${endSec}...`);
 
             // MAGIC COMMAND: Langsung download dan potong di detik tertentu!
-            const cutCmd = `"${YTDLP_PATH}" --no-check-certificate --extractor-args "youtube:player_client=android,web" --ffmpeg-location "${FFMPEG_PATH}" --download-sections "*${startSec}-${endSec}" -f "best[ext=mp4]/best" -o "${outputPath}" "${url}"`;
+            const cutCmd = `"${YTDLP_PATH}" --no-check-certificate --ffmpeg-location "${FFMPEG_PATH}" --download-sections "*${startSec}-${endSec}" -f "best[ext=mp4]/best" -o "${outputPath}" "${url}"`;
 
             // Eksekusi
             execSync(cutCmd, { timeout: 300000, windowsHide: true });
