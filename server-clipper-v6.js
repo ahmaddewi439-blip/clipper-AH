@@ -9,9 +9,10 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors({
-  origin: ['https://clipper-ah-production.up.railway.app', 'https://cineclipper.up.railway.app'],
+  origin: ['https://clipper-ah-production.up.railway.app', 'https://cineclipper.up.railway.app', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 app.use('/output', express.static('output'));
