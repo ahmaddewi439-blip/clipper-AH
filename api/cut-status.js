@@ -6,10 +6,6 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { jobId } = req.query;
-  
-  // Karena tidak ada state persistence, return completed
-  // Frontend sudah handle via start-cut response
   res.json({
     success: true,
     data: {
