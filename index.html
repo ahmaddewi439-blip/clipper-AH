@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/output', express.static('output'));
 
+app.use(express.static(path.join(__dirname, 'public')));
 // ============================================
 // BACKGROUND VIDEO CUTTER - HYBRID APPROACH
 // ============================================
@@ -734,10 +735,7 @@ app.post('/api/render', async (req, res) => {
   }
 });
 
-// Serve folder public sebagai static file
-app.use(express.static(path.join(__dirname, 'public')));
 
-        
 // TAMBAHKAN INI SEBELUM app.listen(PORT, () => {
 
 app.post('/api/get-embed-url', (req, res) => {
