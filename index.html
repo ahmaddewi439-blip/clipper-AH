@@ -748,18 +748,18 @@ function pollCutStatus(jobId, totalClips) {
 
 function updateClipReady(idx, videoUrl, duration) {
   const statusEl = document.getElementById('cut-status-' + idx);
-  const videoEl = document.getElementById('video-' + idx);
+  const videoContainer = document.getElementById('video-container-' + idx);
   const downloadBtn = document.getElementById('btn-download-' + idx);
   
   if (statusEl) statusEl.style.display = 'none';
-  if (videoEl) {
-    videoEl.style.display = 'block';
-    videoEl.src = videoUrl;
-    videoEl.load();
+  
+  // Ganti video dengan iframe embed
+  if (videoContainer) {
+    videoContainer.innerHTML = '<iframe width="100%" height="200" src="' + videoUrl + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
   }
+  
   if (downloadBtn) {
-    downloadBtn.style.display = 'inline-block';
-    downloadBtn.disabled = false;
+    downloadBtn.style.display = 'none'; // Hide download karena tidak bisa generate MP4
   }
 }
 
